@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ACIUD</string>
+    <string name="user">Usuario</string>
+    <string name="password">Contraseña</string>
+    <string name="start">Iniciar</string>
+    <string name="log_in">Iniciar Sesion</string>
+    <string name="register">Registrar</string>
+    <string name="full_name">Nombre Completo</string>
+    <string name="registration_page">Pagina de Registro</string>
+    <string name="name">Nombre</string>
+    <string name="paternal_surname">Apellido Paterno</string>
+    <string name="maternal_surname">Apellido Materno</string>
+    <string name="phone_number">Numero de Telefono</string>
+    <string name="street">Calle</string>
+    <string name="locality">Localidad</string>
+    <string name="suburb">Colonia</string>
+    <string name="gps_location">Ubicacion GPS</string>
+    <string name="longitude">Longitude</string>
+    <string name="latitude">Latitude</string>
+    <string name="responsible">Reponsable</string>
+    <string name="operator">Operador</string>
+    <string name="street_number">Numero de calle</string>
+    <string name="search">Buscar</string>
+    <string name="add">Agregar</string>
+</resources>
