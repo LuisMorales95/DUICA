@@ -1,5 +1,5 @@
 <resources>
-    <string name="API_KEY" translatable="false">;ltpr@bjFH6855Pt]dd0@.</string>
+    <string name="API_KEY" translatable="false">*;ltpr@bjFH6855Pt]dd0@.*</string>
     <string name="app_name">ACIUD</string>
     <string name="user">User</string>
     <string name="password">Password</string>
