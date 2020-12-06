@@ -7,9 +7,16 @@ data class Locality(
     var idLocality: Int? = null,
     @SerializedName("LOCALIDADName")
     var nameLocality: String? = null
-)
+) {
+    companion object {
+        fun getDefault(): Locality {
+            return Locality(1, "COATZACOALCOS")
+        }
+    }
+}
 /*
-*
+{"IDLOCALIDAD":1,"LOCALIDADName":"COATZACOALCOS"}
+
 [
   {
     "IDLOCALIDAD": 1,
@@ -20,4 +27,4 @@ data class Locality(
     "LOCALIDADName": "sample string 2"
   }
 ]
-* */
+*/

@@ -1,9 +1,6 @@
 package com.mezda.aciud.data.api
 
-import com.mezda.aciud.data.models.Locality
-import com.mezda.aciud.data.models.Operators
-import com.mezda.aciud.data.models.Suburb
-import com.mezda.aciud.data.models.Supervisor
+import com.mezda.aciud.data.models.*
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Response
@@ -36,4 +33,24 @@ interface ApiCalls {
         @Query("IDLOCALIDAD") idLocality: Int
     ): Response<List<Suburb>>
 
+    @POST("api/Levantamiento")
+    suspend fun sendLifting(
+        @Query("pwdApp") password: String,
+        @Body body: RequestBody
+    ): Response<Int>
+
+    @GET("api/Levantamiento")
+    suspend fun getLifting(
+        @Query("pwdApp") password: String,
+        @Query("idcolonia") suburb: Int,
+        @Query("idresponsable") idResponsible: Int,
+        @Query("idoperador") idOperator: Int
+    ): Response<List<LiftingInfo>>
+
+    @GET("api/Consultas/GetSeccion")
+    suspend fun getSection(
+            @Query("pwdApp") password: String,
+            @Query("idseccion") idSection: String = "null",
+            @Query("seccion") section: String = "null",
+    ): Response<List<Section>>
 }

@@ -32,5 +32,17 @@
         <action
             android:id="@+id/action_searchFragment_to_liftingFragment"
             app:destination="@id/liftingFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.mezda.aciud.ui.map.MapsFragment"
+        android:label="@string/location"
+        tools:layout="@layout/fragment_maps" >
+        <argument
+            android:name="liftingInfo"
+            app:argType="com.mezda.aciud.data.models.LiftingInfo" />
     </fragment>
 </navigation>

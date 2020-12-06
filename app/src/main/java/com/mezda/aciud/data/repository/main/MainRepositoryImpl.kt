@@ -6,5 +6,5 @@ import com.mezda.aciud.utils.ValueWrapper
 
 class MainRepositoryImpl {
 
-    val liveOperator = MutableLiveData<ValueWrapper<Operators>>()
+    val liveOperator = MutableLiveData<Operators>()
 }

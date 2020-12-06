@@ -12,17 +12,13 @@
         android:layout_height="match_parent"
         tools:context=".ui.MainActivity">
 
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/log_in"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        <ImageView
+            android:id="@+id/logo_image"
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/aciud" />
 
         <LinearLayout
             android:id="@+id/linearLayout"
@@ -31,6 +27,7 @@
             android:layout_marginHorizontal="@dimen/large_margin"
             android:orientation="vertical"
             android:padding="@dimen/large_padding"
+            android:translationY="40dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +36,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/user_text_input_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content" >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -75,6 +72,16 @@
                 android:layout_gravity="right"
                 android:text="@string/register" />
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="@dimen/large_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:src="@drawable/morena_logo" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

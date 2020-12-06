@@ -13,8 +13,8 @@ import retrofit2.Response
 import timber.log.Timber
 
 class RegisterViewModel @ViewModelInject constructor(
-    @Assisted private val savedStateHandle: SavedStateHandle,
-    private val registerRepositoryImpl: RegisterRepositoryImpl
+        @Assisted private val savedStateHandle: SavedStateHandle,
+        private val registerRepositoryImpl: RegisterRepositoryImpl
 ) : BaseViewModel() {
 
     private val _supervisors = MutableLiveData<List<Supervisor>>()
@@ -36,9 +36,8 @@ class RegisterViewModel @ViewModelInject constructor(
         get() = _registerSuccess
 
 
-
     fun onStart() {
-        viewModelScope.launch {
+        ioThread.launch {
             val supervisors = getSupervisors().body() ?: listOf()
             if (supervisors.isEmpty()) {
                 _messages.postValue("Sin Supervisor")
@@ -49,13 +48,11 @@ class RegisterViewModel @ViewModelInject constructor(
     }
 
     private suspend fun getSupervisors(): Response<List<Supervisor>> {
-        return withContext(ioThread) {
-            registerRepositoryImpl.getSupervisors()
-        }
+        return registerRepositoryImpl.getSupervisors()
     }
 
     fun onRegisterUser(user: String, name: String, supervisorId: Int) {
-        viewModelScope.launch {
+        ioThread.launch {
             _loading.postValue(ValueWrapper(true))
             val response = registerUser(user, name, supervisorId)
             _loading.postValue(ValueWrapper(false))
@@ -73,15 +70,13 @@ class RegisterViewModel @ViewModelInject constructor(
     }
 
     private suspend fun registerUser(user: String, name: String, supervisorId: Int): Response<Int> {
-        return withContext(ioThread) {
-            var idSupervisor = 0
-            _supervisors.value?.forEachIndexed { index, supervisor ->
-                if ((supervisorId - 1) == index) {
-                    idSupervisor = supervisor.supervisorId ?: 0
-                }
+        var idSupervisor = 0
+        _supervisors.value?.forEachIndexed { index, supervisor ->
+            if ((supervisorId - 1) == index) {
+                idSupervisor = supervisor.supervisorId ?: 0
             }
-            registerRepositoryImpl.postOperator(user, name, idSupervisor)
         }
+        return registerRepositoryImpl.postOperator(user, name, idSupervisor)
     }
 
     fun registerSuccessful() {

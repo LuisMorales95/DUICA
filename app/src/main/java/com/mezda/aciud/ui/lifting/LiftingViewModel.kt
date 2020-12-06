@@ -4,10 +4,7 @@ import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.google.gson.Gson
-import com.mezda.aciud.data.models.Locality
-import com.mezda.aciud.data.models.Operators
-import com.mezda.aciud.data.models.Suburb
-import com.mezda.aciud.data.models.Supervisor
+import com.mezda.aciud.data.models.*
 import com.mezda.aciud.data.repository.lifting.LiftingRepositoryImpl
 import com.mezda.aciud.data.repository.main.MainRepositoryImpl
 import com.mezda.aciud.ui.BaseViewModel
@@ -16,11 +13,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import timber.log.Timber
+import java.util.*
 
 class LiftingViewModel @ViewModelInject constructor(
-    @Assisted private val savedStateHandle: SavedStateHandle,
-    private val mainRepositoryImpl: MainRepositoryImpl,
-    private val liftingRepositoryImpl: LiftingRepositoryImpl
+        @Assisted private val savedStateHandle: SavedStateHandle,
+        private val mainRepositoryImpl: MainRepositoryImpl,
+        private val liftingRepositoryImpl: LiftingRepositoryImpl
 ) : BaseViewModel() {
 
     private val _localities = MutableLiveData<List<Locality>>()
@@ -43,6 +41,15 @@ class LiftingViewModel @ViewModelInject constructor(
         list
     }
 
+    private val _section = MutableLiveData<List<Section>>()
+    val section = Transformations.map(_section){
+        val list = mutableListOf<String>()
+        it.forEach {
+            list.add(it.section)
+        }
+        list
+    }
+
     private val _supervisor = MutableLiveData<Supervisor>()
     val supervisor: LiveData<Supervisor>
         get() = _supervisor
@@ -51,8 +58,12 @@ class LiftingViewModel @ViewModelInject constructor(
     val operator: LiveData<Operators>
         get() = _operator
 
+    private val _registerSuccess = MutableLiveData<ValueWrapper<Boolean>>()
+    val registerSuccess: LiveData<ValueWrapper<Boolean>>
+        get() = _registerSuccess
+
     fun onGetLocalities() {
-        viewModelScope.launch {
+        ioThread.launch {
             val localities = getLocalities()
             if (localities.isSuccessful) {
                 _localities.postValue(localities.body() ?: listOf())
@@ -63,13 +74,22 @@ class LiftingViewModel @ViewModelInject constructor(
     }
 
     private suspend fun getLocalities(): Response<List<Locality>> {
-        return withContext(ioThread) {
-            liftingRepositoryImpl.getLocalities()
+        return  liftingRepositoryImpl.getLocalities()
+    }
+
+    fun onLocalityByDefault() {
+        ioThread.launch {
+            val suburbsResponse = getSuburbs(Locality.getDefault().idLocality ?: 0)
+            if (suburbsResponse.isSuccessful) {
+                _suburb.postValue(suburbsResponse.body() ?: listOf())
+            } else {
+                _suburb.postValue(listOf())
+            }
         }
     }
 
     fun onLocalitySelected(position: Int) {
-        viewModelScope.launch {
+        ioThread.launch {
             if (position < 0) {
                 _suburb.postValue(listOf())
             } else {
@@ -90,34 +110,102 @@ class LiftingViewModel @ViewModelInject constructor(
     }
 
     private suspend fun getSuburbs(idLocality: Int): Response<List<Suburb>> {
-        return withContext(ioThread) {
-            liftingRepositoryImpl.getSuburbs(idLocality)
-        }
+        return liftingRepositoryImpl.getSuburbs(idLocality)
     }
 
     fun onGetOperator() {
-        viewModelScope.launch {
-            _operator.postValue(mainRepositoryImpl.liveOperator.value?.get())
+        ioThread.launch {
+            _operator.postValue(mainRepositoryImpl.liveOperator.value)
         }
     }
 
     fun onGetSupervisor() {
-        viewModelScope.launch {
+        ioThread.launch {
             val supervisors = getSupervisor()
             if (supervisors.isSuccessful) {
                 Timber.e(Gson().toJson(supervisors.body()))
-                (supervisors.body() ?: listOf()).forEach { sv ->
-                    if (operator.value?.supervisorId == sv.supervisorId) {
-                        _supervisor.postValue(sv)
+                run loop@{
+                    (supervisors.body() ?: listOf()).forEach { sv ->
+                        if (operator.value?.supervisorId == sv.supervisorId) {
+                            _supervisor.postValue(sv)
+                            return@loop
+                        }
                     }
                 }
+
             }
         }
     }
 
     private suspend fun getSupervisor(): Response<List<Supervisor>> {
-        return withContext(ioThread) {
-            liftingRepositoryImpl.getSupervisors()
+        return liftingRepositoryImpl.getSupervisors()
+    }
+
+    fun onGetSections() {
+        ioThread.launch {
+            val sections = liftingRepositoryImpl.getSection()
+            _section.postValue(sections)
         }
+    }
+
+    fun sendLiftingInfo(
+            name: String,
+            paternal_surname: String,
+            maternal_surname: String,
+            phone: String,
+            street: String,
+            street_number: String,
+            locality: Int,
+            suburb: Int,
+            latitude: String,
+            longitude: String,
+            section: String
+    ) {
+        ioThread.launch {
+
+            var sectionObject: Section? = null
+            run loop@ {
+                _section.value?.forEach {
+                    if (section == it.section){
+                        sectionObject = it
+                        return@loop
+                    }
+                }
+            }
+            val liftingInfo = LiftingInfo()
+            liftingInfo.name = name
+            liftingInfo.paternal_surname = paternal_surname
+            liftingInfo.maternal_surname = maternal_surname
+            liftingInfo.phone = phone
+            liftingInfo.street = street
+            liftingInfo.number = street_number
+            liftingInfo.latitude = latitude
+            liftingInfo.longitude = longitude
+            liftingInfo.idSuburb = _suburb.value?.get(suburb - 1)?.idSuburb ?: 0
+            liftingInfo.idOperator = _operator.value?.operatorId
+            liftingInfo.idSupervisor = _operator.value?.supervisorId
+            liftingInfo.date = Date(System.currentTimeMillis()).toString()
+            liftingInfo.section = sectionObject?.section
+            liftingInfo.sectionId = sectionObject?.idSection
+            val response = sendInfo(liftingInfo)
+            if (response.isSuccessful) {
+                if ((response.body() ?: 0) > 0) {
+                    _messages.postValue("Solicitud Exitosa")
+                    _registerSuccess.postValue(ValueWrapper(true))
+                } else {
+                    _messages.postValue("Solicitud Fallo")
+                }
+            } else {
+                _messages.postValue("Solicitud Fallo")
+            }
+        }
+    }
+
+    private suspend fun sendInfo(liftingInfo: LiftingInfo): Response<Int> {
+        return liftingRepositoryImpl.sendLifting(liftingInfo)
+    }
+
+    fun registerSuccessful() {
+        _registerSuccess.postValue(ValueWrapper(false))
     }
 }

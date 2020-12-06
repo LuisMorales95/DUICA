@@ -30,7 +30,7 @@ class LoginViewModel @ViewModelInject constructor(
     get() = _loginSuccess
 
     fun login(user: String) {
-        viewModelScope.launch {
+        ioThread.launch {
             _loading.postValue(ValueWrapper(true))
             val operators = getOperators().body() ?: listOf()
             _loading.postValue(ValueWrapper(false))
@@ -42,7 +42,7 @@ class LoginViewModel @ViewModelInject constructor(
                     operators.forEach {
                         if (it.user == user) {
                             found = true
-                            mainRepositoryImpl.liveOperator.postValue(ValueWrapper(it))
+                            mainRepositoryImpl.liveOperator.postValue(it)
                             _messages.postValue("Usuario Encontrado")
                             _loginSuccess.postValue(ValueWrapper(true))
                             return@loop
@@ -58,9 +58,7 @@ class LoginViewModel @ViewModelInject constructor(
     }
 
     private suspend fun getOperators(): Response<List<Operators>> {
-        return withContext(ioThread) {
-            loginRepository.getOperators()
-        }
+        return loginRepository.getOperators()
     }
 
     fun loggedSuccessful(){

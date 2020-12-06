@@ -5,4 +5,5 @@
     <dimen name="medium_padding">8dp</dimen>
     <dimen name="small_margin">4dp</dimen>
     <dimen name="medium_margin">8dp</dimen>
+    <dimen name="edittext_vertical_size">17dp</dimen>
 </resources>

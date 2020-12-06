@@ -26,4 +26,7 @@
     <string name="street_number">Street #</string>
     <string name="search">Search</string>
     <string name="add">Add</string>
+    <string name="section">Section</string>
+    <string name="lifting" translatable="false">LEVANTAMIENTOS</string>
+    <string name="location">Ubicación</string>
 </resources>

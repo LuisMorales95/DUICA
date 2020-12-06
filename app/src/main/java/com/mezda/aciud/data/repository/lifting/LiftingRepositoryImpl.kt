@@ -1,12 +1,15 @@
 package com.mezda.aciud.data.repository.lifting
 
+import com.google.gson.Gson
+import com.mezda.aciud.ACIUDApp
 import com.mezda.aciud.data.api.ApiCalls
-import com.mezda.aciud.data.models.Locality
-import com.mezda.aciud.data.models.Operators
-import com.mezda.aciud.data.models.Suburb
-import com.mezda.aciud.data.models.Supervisor
+import com.mezda.aciud.data.models.*
 import com.mezda.aciud.data.preference.Preference
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 class LiftingRepositoryImpl (
@@ -23,5 +26,18 @@ class LiftingRepositoryImpl (
 
     suspend fun getSuburbs(idLocality: Int): Response<List<Suburb>> {
         return apiCalls.getSuburbs(preference.pwdApp(),idLocality)
+    }
+
+    suspend fun sendLifting(liftingInfo: LiftingInfo): Response<Int> {
+        val body = Gson().toJson(liftingInfo).toRequestBody(ACIUDApp.mediaType)
+        return apiCalls.sendLifting(preference.pwdApp(),body)
+    }
+    suspend fun getSection(): List<Section> {
+        val response = apiCalls.getSection(preference.pwdApp())
+        return if (response.isSuccessful) {
+            response.body() ?: listOf()
+        } else {
+            listOf()
+        }
     }
 }

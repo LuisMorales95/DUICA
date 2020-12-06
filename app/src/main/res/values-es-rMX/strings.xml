@@ -23,4 +23,6 @@
     <string name="street_number">Numero de calle</string>
     <string name="search">Buscar</string>
     <string name="add">Agregar</string>
+    <string name="section">Seccion</string>
+    <string name="location">Location</string>
 </resources>
