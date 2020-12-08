@@ -1,6 +1,7 @@
 package com.mezda.aciud.ui.lifting
 
 import android.os.Bundle
+import android.text.InputFilter
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -13,6 +14,8 @@ import com.mezda.aciud.data.GPSTracker
 import com.mezda.aciud.data.models.Locality
 import com.mezda.aciud.databinding.FragmentLiftingBinding
 import com.mezda.aciud.ui.BaseFragment
+import com.mezda.aciud.utils.SuburbAutoCompleteValidator
+import com.mezda.aciud.utils.SuburbFocusListener
 import com.mezda.aciud.utils.section.SectionAutoCompleteValidator
 import com.mezda.aciud.utils.section.SectionFocusListener
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,15 +48,21 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
         })
 
         liftingViewModel.suburb.observe(viewLifecycleOwner, {
-            binding.suburbSpinner.adapter = ArrayAdapter(
+            val adapter: ArrayAdapter<String> = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, it.toTypedArray())
+            binding.suburbAutoComplete.filters = arrayOf<InputFilter>(InputFilter.AllCaps())
+            binding.suburbAutoComplete.setAdapter(adapter)
+            binding.suburbAutoComplete.validator = SuburbAutoCompleteValidator(it)
+            binding.suburbAutoComplete.onFocusChangeListener = SuburbFocusListener()
+            /*binding.suburbSpinner.adapter = ArrayAdapter(
                     requireContext(),
                     android.R.layout.simple_list_item_1,
                     it.toTypedArray()
-            )
+            )*/
         })
 
         liftingViewModel.section.observe(viewLifecycleOwner) {
             val adapter: ArrayAdapter<String> = ArrayAdapter<String>(requireContext(), android.R.layout.simple_dropdown_item_1line, it.toTypedArray())
+//            binding.sectionSpinner.adapter = adapter
             binding.sectionAutoComplete.setAdapter(adapter)
             binding.sectionAutoComplete.validator = SectionAutoCompleteValidator(it)
             binding.sectionAutoComplete.onFocusChangeListener = SectionFocusListener()
@@ -122,7 +131,7 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
                             binding.streetText.editText?.text.toString(),
                             binding.streetNumberText.editText?.text.toString(),
                             binding.localitySpinner.selectedItemPosition,
-                            binding.suburbSpinner.selectedItemPosition,
+                            binding.suburbAutoComplete.text.toString(),
                             binding.latitudeText.text.toString(),
                             binding.longitudeText.text.toString(),
                             binding.sectionAutoComplete.text.toString()
@@ -139,6 +148,7 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
         binding.phoneNumberText.isErrorEnabled = false
         binding.streetText.isErrorEnabled = false
         binding.streetNumberText.isErrorEnabled = false
+
         return when {
             binding.nameText.editText?.text.toString().isEmpty() -> {
                 binding.nameText.error = "Requerido"
@@ -164,6 +174,10 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
                 binding.streetNumberText.error = "Requerido"
                 false
             }
+            binding.suburbAutoComplete.text.toString().isEmpty() -> {
+                binding.streetNumberText.error = "Requerido"
+                false
+            }
             /*binding.localitySpinner.selectedItemPosition == 0 || binding.suburbSpinner.selectedItemPosition == 0 -> {
                 Toast.makeText(requireContext(), "Ubicacion ó Colonia faltante", Toast.LENGTH_SHORT)
                     .show()
@@ -177,7 +191,7 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
                 false
             }
             binding.sectionAutoComplete.text.toString().isEmpty() -> {
-                binding.sectionAutoComplete.error = "Requiered"
+                binding.sectionAutoComplete.error = "Requerido"
                 false
             }
             else -> true

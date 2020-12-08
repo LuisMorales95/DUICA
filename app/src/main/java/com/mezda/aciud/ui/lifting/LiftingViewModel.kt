@@ -44,6 +44,7 @@ class LiftingViewModel @ViewModelInject constructor(
     private val _section = MutableLiveData<List<Section>>()
     val section = Transformations.map(_section){
         val list = mutableListOf<String>()
+        list.add("Selecciona una seccion")
         it.forEach {
             list.add(it.section)
         }
@@ -156,22 +157,32 @@ class LiftingViewModel @ViewModelInject constructor(
             street: String,
             street_number: String,
             locality: Int,
-            suburb: Int,
+            suburb: String,
             latitude: String,
             longitude: String,
-            section: String
+            sectionName: String
     ) {
         ioThread.launch {
-
-            var sectionObject: Section? = null
+            var suburbIndex = 0
             run loop@ {
-                _section.value?.forEach {
-                    if (section == it.section){
-                        sectionObject = it
+                _suburb.value?.forEachIndexed { index, suburbs ->
+                    if (suburbs.nameSuburb == suburb){
+                        suburbIndex = index
                         return@loop
                     }
                 }
             }
+
+            var sectionId = 0
+            run loop@ {
+                _section.value?.forEachIndexed { index, section ->
+                    if (section.section == sectionName){
+                        sectionId = index
+                        return@loop
+                    }
+                }
+            }
+
             val liftingInfo = LiftingInfo()
             liftingInfo.name = name
             liftingInfo.paternal_surname = paternal_surname
@@ -181,12 +192,12 @@ class LiftingViewModel @ViewModelInject constructor(
             liftingInfo.number = street_number
             liftingInfo.latitude = latitude
             liftingInfo.longitude = longitude
-            liftingInfo.idSuburb = _suburb.value?.get(suburb - 1)?.idSuburb ?: 0
+            liftingInfo.idSuburb = _suburb.value?.get(suburbIndex)?.idSuburb ?: 0
             liftingInfo.idOperator = _operator.value?.operatorId
             liftingInfo.idSupervisor = _operator.value?.supervisorId
             liftingInfo.date = Date(System.currentTimeMillis()).toString()
-            liftingInfo.section = sectionObject?.section
-            liftingInfo.sectionId = sectionObject?.idSection
+            liftingInfo.section = _section.value?.get(sectionId)?.section
+            liftingInfo.sectionId = _section.value?.get(sectionId)?.idSection
             val response = sendInfo(liftingInfo)
             if (response.isSuccessful) {
                 if ((response.body() ?: 0) > 0) {

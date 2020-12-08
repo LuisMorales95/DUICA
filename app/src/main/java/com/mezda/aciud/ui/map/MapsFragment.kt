@@ -1,6 +1,8 @@
 package com.mezda.aciud.ui.map
 
+import android.content.res.Resources.NotFoundException
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,10 +11,12 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.mezda.aciud.R
-import com.mezda.aciud.ui.MainActivity
+import timber.log.Timber
 
 class MapsFragment : Fragment() {
     val args: MapsFragmentArgs by navArgs()
@@ -27,25 +31,45 @@ class MapsFragment : Fragment() {
          * install it inside the SupportMapFragment. This method will only be triggered once the
          * user has installed Google Play services and returned to the app.
          */
-
         val liftingInfo = args.liftingInfo
         val place = LatLng(
-            (liftingInfo.latitude ?: "0.0").toDouble(),
-            (liftingInfo.longitude ?: "0.0").toDouble()
+                (liftingInfo.latitude ?: "0.0").toDouble(),
+                (liftingInfo.longitude ?: "0.0").toDouble()
         )
-        googleMap.addMarker(
-            MarkerOptions().position(place)
-                .title("${liftingInfo.name} ${liftingInfo.paternal_surname} ${liftingInfo.maternal_surname}\n ${liftingInfo.number} ${liftingInfo.street}")
+        // Add a marker in Sydney and move the camera
+        try {
+            val success = googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            requireContext(),
+                            R.raw.style_json
+                    )
+            )
+            if (!success) Timber.e("Style parsing failed.")
+        } catch (e: NotFoundException) {
+            Timber.e("Can't find style. Error: $e")
+        }
+        googleMap.addMarker(MarkerOptions().position(place).title(
+                "${liftingInfo.name} ${liftingInfo.paternal_surname} ${liftingInfo.maternal_surname}\n ${liftingInfo.number} ${liftingInfo.street}"
+        ))
+        val camera = CameraPosition.Builder().target(place).zoom(15f).bearing(0f).tilt(30f).build()
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
+
+        /*googleMap.addMarker(
+                MarkerOptions().position(place)
+                        .title("${liftingInfo.name} ${liftingInfo.paternal_surname} ${liftingInfo.maternal_surname}\n ${liftingInfo.number} ${liftingInfo.street}")
         )
+        val cameraPosition = CameraPosition.Builder().target(Place_LngLat).zoom(15f).bearing(0f).tilt(30f).build()
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+
         val zoom = CameraUpdateFactory.zoomTo(15f)
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(place))
-        googleMap.animateCamera(zoom)
+        googleMap.animateCamera(zoom)*/
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_maps, container, false)
     }

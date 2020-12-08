@@ -1,11 +1,13 @@
 package com.mezda.aciud.ui.search
 
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.InputFilter.AllCaps
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,16 +17,18 @@ import com.mezda.aciud.data.models.Locality
 import com.mezda.aciud.databinding.FragmentSearchBinding
 import com.mezda.aciud.ui.BaseFragment
 import com.mezda.aciud.ui.MainActivity
-import com.mezda.aciud.ui.lifting.LiftingViewModel
 import com.mezda.aciud.utils.LiftingAdapter
+import com.mezda.aciud.utils.SuburbAutoCompleteValidator
+import com.mezda.aciud.utils.SuburbFocusListener
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SearchFragment : BaseFragment() {
+class SearchFragment : BaseFragment(), View.OnClickListener {
 
     private lateinit var binding: FragmentSearchBinding
     private lateinit var liftingAdapter: LiftingAdapter
     private val searchViewModel by viewModels<SearchViewModel>()
+    private var isAdmin = false
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -59,28 +63,19 @@ class SearchFragment : BaseFragment() {
                     override fun onNothingSelected(p0: AdapterView<*>?) {}
                 }
 
+        binding.suburbSpinner.visibility = View.GONE
         searchViewModel.suburb.observe(viewLifecycleOwner, {
-            binding.suburbSpinner.adapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_list_item_1,
-                    it.toTypedArray()
-            )
+            val adapter: ArrayAdapter<String> = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, it.toTypedArray())
+            binding.suburbAutoComplete.filters = arrayOf<InputFilter>(AllCaps())
+            binding.suburbAutoComplete.setAdapter(adapter)
+            binding.suburbAutoComplete.validator = SuburbAutoCompleteValidator(it)
+            binding.suburbAutoComplete.onFocusChangeListener = SuburbFocusListener()
         })
-
-        binding.suburbSpinner.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                        if (p2 != 0) {
-                            searchViewModel.searchLifting(p2.minus(1))
-                        }
-                    }
-
-                    override fun onNothingSelected(p0: AdapterView<*>?) {}
-                }
 
         searchViewModel.operator.observe(viewLifecycleOwner, {
             (requireActivity() as MainActivity).supportActionBar?.title = it.name
             if (it.name == "Administrador") {
+                isAdmin = true
                 binding.operatorSpinner.visibility = View.VISIBLE
                 searchViewModel.onOperator()
             }
@@ -115,6 +110,7 @@ class SearchFragment : BaseFragment() {
 
 
         searchViewModel.onStart()
+        binding.searchButton.setOnClickListener(this)
         return binding.root
     }
 
@@ -130,5 +126,25 @@ class SearchFragment : BaseFragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onClick(p0: View?) {
+        when(p0?.id){
+            binding.searchButton.id -> {
+                if (isAdmin) {
+                    if (binding.suburbAutoComplete.text.toString().isNotEmpty() && binding.operatorSpinner.selectedItemPosition != 0) {
+                        searchViewModel.onSearch(binding.suburbAutoComplete.text.toString(), binding.operatorSpinner.selectedItemPosition, isAdmin)
+                    } else {
+                        Toast.makeText(requireContext(), "Datos faltante", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    if (binding.suburbAutoComplete.text.toString().isNotEmpty()) {
+                        searchViewModel.onSearch(binding.suburbAutoComplete.text.toString())
+                    } else {
+                        Toast.makeText(requireContext(), "Datos faltante", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 }

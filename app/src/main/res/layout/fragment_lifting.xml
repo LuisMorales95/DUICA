@@ -28,20 +28,13 @@
                 android:orientation="vertical"
                 android:padding="@dimen/large_padding">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                <AutoCompleteTextView
-                    android:id="@+id/section_auto_complete"
-                    style="@style/Widget.AppCompat.EditText"
+                <!--<Spinner
+                    android:id="@+id/section_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/section"
-                    android:paddingVertical="@dimen/edittext_vertical_size"
-                    android:paddingHorizontal="12dp"
-                    android:textSize="16sp" />
-                </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginTop="@dimen/medium_margin"
+                    tools:listitem="@android:layout/simple_dropdown_item_1line" />-->
+
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/name_text"
@@ -119,12 +112,27 @@
                     android:id="@+id/locality_textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/medium_margin"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:padding="@dimen/medium_padding"
-                    android:layout_marginTop="@dimen/medium_margin"
                     android:textStyle="bold"
                     tools:text="@string/locality" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/section_auto_complete"
+                        style="@style/Widget.AppCompat.EditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/section"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="@dimen/edittext_vertical_size"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <Spinner
                     android:id="@+id/locality_spinner"
@@ -133,12 +141,27 @@
                     android:layout_marginTop="@dimen/medium_margin"
                     tools:listitem="@android:layout/simple_dropdown_item_1line" />
 
-                <Spinner
+                <!--<Spinner
                     android:id="@+id/suburb_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/medium_margin"
-                    tools:listitem="@android:layout/simple_dropdown_item_1line" />
+                    tools:listitem="@android:layout/simple_dropdown_item_1line" />-->
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/suburb_auto_complete"
+                        style="@style/Widget.AppCompat.EditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/suburb"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="@dimen/edittext_vertical_size"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"

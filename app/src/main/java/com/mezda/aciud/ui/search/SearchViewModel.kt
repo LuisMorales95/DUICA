@@ -55,7 +55,8 @@ class SearchViewModel @ViewModelInject constructor(
             _liftingData.postValue(mutableListOf())
             _localities.postValue(mutableListOf())
             _suburb.postValue(mutableListOf())
-            onGetSearchSuburbs()
+            findLifting()
+//            onGetSearchSuburbs()
 //            val locality = getLocalities()
 //            if (locality.isSuccessful) {
 //                _localities.postValue(locality.body()?.toMutableList())
@@ -93,6 +94,15 @@ class SearchViewModel @ViewModelInject constructor(
            return searchRepositoryImpl.getLifting(suburb, idResponsible, idOperator)
     }
 
+    fun findLifting() {
+        ioThread.launch {
+            val lifting = getLifting(0, _operator.value?.supervisorId
+                    ?: 0, _operator.value?.operatorId ?: 0)
+            if (lifting.isSuccessful) {
+                _liftingData.postValue(lifting.body()?.toMutableList())
+            }
+        }
+    }
     fun searchLifting(minus: Int) {
         ioThread.launch {
             defaultPosition = minus
@@ -133,13 +143,49 @@ class SearchViewModel @ViewModelInject constructor(
     fun onSearchLifting(operatorPosition: Int) {
         ioThread.launch {
             val operators = _operatorList.value?.get(operatorPosition - 1)
-            val suburbSelected = _suburb.value?.get(defaultPosition)
-            val lifting = getLifting(suburbSelected?.idSuburb ?: 0, operators?.supervisorId
+            val lifting = getLifting( 0, operators?.supervisorId
                     ?: 0, operators?.operatorId ?: 0)
             if (lifting.isSuccessful) {
                 _liftingData.postValue(lifting.body()?.toMutableList())
             }
         }
     }
+
+    fun onSearch(suburb: String, operatorPosition: Int = 0, isAdmin: Boolean = false) {
+        ioThread.launch {
+            if (isAdmin) {
+                var subIndex = 0
+                _suburb.value?.forEachIndexed { index, suburbs ->
+                    if (suburbs.nameSuburb == suburb){
+                        subIndex = index
+                    }
+                }
+                val lifting = getLifting(
+                        _suburb.value?.get(subIndex)?.idSuburb ?: 0,
+                        _operatorList.value?.get(operatorPosition - 1)?.supervisorId ?: 0,
+                        _operatorList.value?.get(operatorPosition - 1)?.operatorId ?: 0
+                )
+                if (lifting.isSuccessful) {
+                    _liftingData.postValue(lifting.body()?.toMutableList())
+                }
+            } else {
+                var subIndex = 0
+                _suburb.value?.forEachIndexed { index, suburbs ->
+                    if (suburbs.nameSuburb == suburb){
+                        subIndex = index
+                    }
+                }
+                val lifting = getLifting(
+                        _suburb.value?.get(subIndex)?.idSuburb ?: 0,
+                        operator.value?.supervisorId ?: 0,
+                        operator.value?.operatorId ?: 0
+                )
+                if (lifting.isSuccessful) {
+                    _liftingData.postValue(lifting.body()?.toMutableList())
+                }
+            }
+        }
+    }
+
 
 }
