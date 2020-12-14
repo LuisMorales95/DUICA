@@ -21,6 +21,10 @@ class LiftingViewModel @ViewModelInject constructor(
         private val liftingRepositoryImpl: LiftingRepositoryImpl
 ) : BaseViewModel() {
 
+    private val _loading = MutableLiveData<Boolean>()
+    val loading : LiveData<Boolean>
+        get() = _loading
+
     private val _localities = MutableLiveData<List<Locality>>()
     val localities = Transformations.map(_localities) {
         val list = mutableListOf<String>()
@@ -47,6 +51,26 @@ class LiftingViewModel @ViewModelInject constructor(
         list.add("Selecciona una seccion")
         it.forEach {
             list.add(it.section)
+        }
+        list
+    }
+
+    private val _profession = MutableLiveData<List<Profession>>()
+    val profession = Transformations.map(_profession){
+        val list = mutableListOf<String>()
+        list.add("Selecciona una profession")
+        it.forEach { professions ->
+            list.add(professions.profession)
+        }
+        list
+    }
+
+    private val _supportType = MutableLiveData<List<SupportTypes>>()
+    val supportType = Transformations.map(_supportType){
+        val list = mutableListOf<String>()
+        list.add("Selecciona un Tipo de apoyo")
+        it.forEach { support ->
+            list.add(support.supportType)
         }
         list
     }
@@ -160,9 +184,15 @@ class LiftingViewModel @ViewModelInject constructor(
             suburb: String,
             latitude: String,
             longitude: String,
-            sectionName: String
+            sectionName: String,
+            profession: Int,
+            supportTypes: Int,
+            observations: String,
+            sympathizer: Boolean,
+            image: String?
     ) {
         ioThread.launch {
+            _loading.postValue(true)
             var suburbIndex = 0
             run loop@ {
                 _suburb.value?.forEachIndexed { index, suburbs ->
@@ -183,6 +213,9 @@ class LiftingViewModel @ViewModelInject constructor(
                 }
             }
 
+            val professionId = _profession.value?.get(profession - 1)?.id ?: 0
+            val supportTypesId = _supportType.value?.get(supportTypes - 1)?.id ?: 0
+
             val liftingInfo = LiftingInfo()
             liftingInfo.name = name
             liftingInfo.paternal_surname = paternal_surname
@@ -198,7 +231,15 @@ class LiftingViewModel @ViewModelInject constructor(
             liftingInfo.date = Date(System.currentTimeMillis()).toString()
             liftingInfo.section = _section.value?.get(sectionId)?.section
             liftingInfo.sectionId = _section.value?.get(sectionId)?.idSection
+            liftingInfo.professionId = professionId
+            liftingInfo.supportTypeId = supportTypesId
+            liftingInfo.observations = observations
+            liftingInfo.sympathizer = sympathizer
+            liftingInfo.image = image
+
+
             val response = sendInfo(liftingInfo)
+            _loading.postValue(false)
             if (response.isSuccessful) {
                 if ((response.body() ?: 0) > 0) {
                     _messages.postValue("Solicitud Exitosa")
@@ -218,5 +259,17 @@ class LiftingViewModel @ViewModelInject constructor(
 
     fun registerSuccessful() {
         _registerSuccess.postValue(ValueWrapper(false))
+    }
+
+    fun onGetProfessions() {
+        ioThread.launch {
+            _profession.postValue(liftingRepositoryImpl.getProfession())
+        }
+    }
+
+    fun onGetSupportType() {
+        ioThread.launch {
+            _supportType.postValue(liftingRepositoryImpl.getSupportType())
+        }
     }
 }

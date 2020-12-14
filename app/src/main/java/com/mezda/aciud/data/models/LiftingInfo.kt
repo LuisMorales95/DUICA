@@ -34,7 +34,18 @@ data class LiftingInfo(
     @SerializedName("Seccion")
     var section: String? = null,
     @SerializedName("Idseccion")
-    var sectionId: Int? = null
+    var sectionId: Int? = null,
+
+    @SerializedName("Idprofesion")
+    var professionId: Int? = null,
+    @SerializedName("Idtapoyo")
+    var supportTypeId: Int? = null,
+    @SerializedName("Observaciones")
+    var observations: String? = null,
+    @SerializedName("Simpatizante")
+    var sympathizer: Boolean? = null,
+    @SerializedName("Imagen")
+    var image: String? = null
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),
@@ -51,7 +62,12 @@ data class LiftingInfo(
         parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readString(),
-        parcel.readValue(Int::class.java.classLoader) as? Int
+        parcel.readValue(Int::class.java.classLoader) as? Int,
+        parcel.readValue(Int::class.java.classLoader) as? Int,
+        parcel.readValue(Int::class.java.classLoader) as? Int,
+        parcel.readString(),
+        parcel.readValue(Boolean::class.java.classLoader) as? Boolean,
+        parcel.readString()
     ) {
     }
 
@@ -71,6 +87,11 @@ data class LiftingInfo(
         parcel.writeValue(idOperator)
         parcel.writeString(section)
         parcel.writeValue(sectionId)
+        parcel.writeValue(professionId)
+        parcel.writeValue(supportTypeId)
+        parcel.writeString(observations)
+        parcel.writeValue(sympathizer)
+        parcel.writeString(image)
     }
 
     override fun describeContents(): Int {

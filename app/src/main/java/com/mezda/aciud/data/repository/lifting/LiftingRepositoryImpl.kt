@@ -12,11 +12,11 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-class LiftingRepositoryImpl (
+class LiftingRepositoryImpl(
     private val apiCalls: ApiCalls,
     private val preference: Preference
 ) {
-    suspend fun getSupervisors( ): Response<List<Supervisor>> {
+    suspend fun getSupervisors(): Response<List<Supervisor>> {
         return apiCalls.getSupervisors(preference.pwdApp())
     }
 
@@ -25,15 +25,34 @@ class LiftingRepositoryImpl (
     }
 
     suspend fun getSuburbs(idLocality: Int): Response<List<Suburb>> {
-        return apiCalls.getSuburbs(preference.pwdApp(),idLocality)
+        return apiCalls.getSuburbs(preference.pwdApp(), idLocality)
     }
 
     suspend fun sendLifting(liftingInfo: LiftingInfo): Response<Int> {
         val body = Gson().toJson(liftingInfo).toRequestBody(ACIUDApp.mediaType)
-        return apiCalls.sendLifting(preference.pwdApp(),body)
+        return apiCalls.sendLifting(preference.pwdApp(), body)
     }
+
     suspend fun getSection(): List<Section> {
         val response = apiCalls.getSection(preference.pwdApp())
+        return if (response.isSuccessful) {
+            response.body() ?: listOf()
+        } else {
+            listOf()
+        }
+    }
+
+    suspend fun getProfession(): List<Profession> {
+        val response = apiCalls.getProfession(preference.pwdApp())
+        return if (response.isSuccessful) {
+            response.body() ?: listOf()
+        } else {
+            listOf()
+        }
+    }
+
+    suspend fun getSupportType(): List<SupportTypes>{
+        val response = apiCalls.getSupportType(preference.pwdApp())
         return if (response.isSuccessful) {
             response.body() ?: listOf()
         } else {

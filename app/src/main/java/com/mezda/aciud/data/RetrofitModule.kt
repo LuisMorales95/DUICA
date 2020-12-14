@@ -15,6 +15,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -33,19 +34,22 @@ class RetrofitModule {
         val bodyInterceptor = HttpLoggingInterceptor()
         bodyInterceptor.level = HttpLoggingInterceptor.Level.BODY
         return OkHttpClient.Builder()
-            .addInterceptor(headerInterceptor)
-            .addInterceptor(bodyInterceptor)
-            .build()
+                .addInterceptor(headerInterceptor)
+                .addInterceptor(bodyInterceptor)
+                .connectTimeout(5, TimeUnit.MINUTES)
+                .writeTimeout(5, TimeUnit.MINUTES)
+                .readTimeout(5, TimeUnit.MINUTES)
+                .build()
     }
 
     @Provides
     @ActivityScoped
     fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+                .baseUrl(baseUrl)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
     }
 
     @Provides
@@ -53,7 +57,6 @@ class RetrofitModule {
     fun providesApiCalls(retrofit: Retrofit): ApiCalls {
         return retrofit.create(ApiCalls::class.java)
     }
-
 
 
 }

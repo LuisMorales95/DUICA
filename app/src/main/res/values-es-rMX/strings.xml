@@ -25,4 +25,5 @@
     <string name="add">Agregar</string>
     <string name="section">Seccion</string>
     <string name="location">Location</string>
+    <string name="observations">Observaciones</string>
 </resources>

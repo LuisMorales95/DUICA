@@ -72,6 +72,7 @@ class LoginFragment : BaseFragment() {
         Glide.with(requireView()).load(R.drawable.aciud).into(binding.logoImage)
         Glide.with(requireView()).load(R.drawable.morena_logo).into(binding.imageView)
     }
+
     companion object {
         const val REQUEST_MULTIPLE_PERMISSIONS = 101
     }
@@ -87,7 +88,10 @@ class LoginFragment : BaseFragment() {
             requireActivity(),
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
             ), REQUEST_MULTIPLE_PERMISSIONS
         )
     }
@@ -100,6 +104,18 @@ class LoginFragment : BaseFragment() {
                 ContextCompat.checkSelfPermission(
                     requireContext(),
                     Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.CAMERA
+                ) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ) != PackageManager.PERMISSION_GRANTED
 
     override fun onRequestPermissionsResult(

@@ -53,4 +53,15 @@ interface ApiCalls {
             @Query("idseccion") idSection: String = "null",
             @Query("seccion") section: String = "null",
     ): Response<List<Section>>
+
+    @GET("api/Consultas/GetProfesion")
+    suspend fun getProfession(
+        @Query("pwdApp") password: String
+    ): Response<List<Profession>>
+
+
+    @GET("api/Consultas/GetTipoApoyo")
+    suspend fun getSupportType(
+        @Query("pwdApp") password: String
+    ): Response<List<SupportTypes>>
 }
