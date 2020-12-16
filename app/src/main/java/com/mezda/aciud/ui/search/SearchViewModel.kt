@@ -56,6 +56,7 @@ class SearchViewModel @ViewModelInject constructor(
             _localities.postValue(mutableListOf())
             _suburb.postValue(mutableListOf())
             findLifting()
+            onGetSearchSuburbs()
 //            onGetSearchSuburbs()
 //            val locality = getLocalities()
 //            if (locality.isSuccessful) {
@@ -65,7 +66,7 @@ class SearchViewModel @ViewModelInject constructor(
     }
 
     private suspend fun getLocalities(): Response<List<Locality>> {
-        return  searchRepositoryImpl.getLocalities()
+        return searchRepositoryImpl.getLocalities()
     }
 
     fun searchSuburbs(i: Int) {
@@ -87,11 +88,11 @@ class SearchViewModel @ViewModelInject constructor(
     }
 
     private suspend fun getSuburb(idLocality: Int): Response<List<Suburb>> {
-          return  searchRepositoryImpl.getSuburbs(idLocality)
+        return searchRepositoryImpl.getSuburbs(idLocality)
     }
 
     suspend fun getLifting(suburb: Int, idResponsible: Int, idOperator: Int): Response<List<LiftingInfo>> {
-           return searchRepositoryImpl.getLifting(suburb, idResponsible, idOperator)
+        return searchRepositoryImpl.getLifting(suburb, idResponsible, idOperator)
     }
 
     fun findLifting() {
@@ -103,6 +104,7 @@ class SearchViewModel @ViewModelInject constructor(
             }
         }
     }
+
     fun searchLifting(minus: Int) {
         ioThread.launch {
             defaultPosition = minus
@@ -137,13 +139,13 @@ class SearchViewModel @ViewModelInject constructor(
     }
 
     private suspend fun getOperators(): Response<List<Operators>> {
-           return searchRepositoryImpl.getOperators()
+        return searchRepositoryImpl.getOperators()
     }
 
     fun onSearchLifting(operatorPosition: Int) {
         ioThread.launch {
             val operators = _operatorList.value?.get(operatorPosition - 1)
-            val lifting = getLifting( 0, operators?.supervisorId
+            val lifting = getLifting(0, operators?.supervisorId
                     ?: 0, operators?.operatorId ?: 0)
             if (lifting.isSuccessful) {
                 _liftingData.postValue(lifting.body()?.toMutableList())
@@ -156,7 +158,7 @@ class SearchViewModel @ViewModelInject constructor(
             if (isAdmin) {
                 var subIndex = 0
                 _suburb.value?.forEachIndexed { index, suburbs ->
-                    if (suburbs.nameSuburb == suburb){
+                    if (suburbs.nameSuburb == suburb) {
                         subIndex = index
                     }
                 }
@@ -171,7 +173,7 @@ class SearchViewModel @ViewModelInject constructor(
             } else {
                 var subIndex = 0
                 _suburb.value?.forEachIndexed { index, suburbs ->
-                    if (suburbs.nameSuburb == suburb){
+                    if (suburbs.nameSuburb == suburb) {
                         subIndex = index
                     }
                 }
@@ -186,6 +188,4 @@ class SearchViewModel @ViewModelInject constructor(
             }
         }
     }
-
-
 }

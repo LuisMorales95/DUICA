@@ -23,7 +23,7 @@ class SearchRepositoryImpl(
     suspend fun getLifting(
         suburb: Int, idResponsible: Int, idOperator: Int
     ): Response<List<LiftingInfo>> {
-        return apiCalls.getLifting(password = preference.pwdApp(), idResponsible = idResponsible, idOperator =  idOperator)
+        return apiCalls.getLifting(password = preference.pwdApp(), idResponsible = idResponsible, idOperator =  idOperator, suburb = suburb)
     }
 
     suspend fun getOperators(): Response<List<Operators>> {

@@ -42,7 +42,7 @@ interface ApiCalls {
     @GET("api/Levantamiento")
     suspend fun getLifting(
         @Query("pwdApp") password: String,
-        @Query("idcolonia") suburb: String = "null",
+        @Query("idcolonia") suburb: Int,
         @Query("idresponsable") idResponsible: Int,
         @Query("idoperador") idOperator: Int
     ): Response<List<LiftingInfo>>

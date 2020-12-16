@@ -1,13 +1,16 @@
 package com.mezda.aciud.ui.map
 
 import android.content.res.Resources.NotFoundException
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -16,9 +19,13 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.mezda.aciud.R
+import com.mezda.aciud.data.RetrofitModule
+import com.mezda.aciud.databinding.FragmentMapsBinding
 import timber.log.Timber
 
 class MapsFragment : Fragment() {
+
+    lateinit var binding: FragmentMapsBinding
     val args: MapsFragmentArgs by navArgs()
 
     private val callback = OnMapReadyCallback { googleMap ->
@@ -32,6 +39,10 @@ class MapsFragment : Fragment() {
          * user has installed Google Play services and returned to the app.
          */
         val liftingInfo = args.liftingInfo
+        if ((liftingInfo.image ?: "").isNotEmpty()) {
+            binding.pictureImageView.visibility = View.VISIBLE
+            Glide.with(requireActivity()).load(RetrofitModule.baseUrl + liftingInfo.image?.replace("~/", "")).into(binding.pictureImageView)
+        }
         val place = LatLng(
                 (liftingInfo.latitude ?: "0.0").toDouble(),
                 (liftingInfo.longitude ?: "0.0").toDouble()
@@ -70,8 +81,9 @@ class MapsFragment : Fragment() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_maps, container, false)
+    ): View {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_maps, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

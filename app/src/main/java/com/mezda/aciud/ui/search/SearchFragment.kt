@@ -51,7 +51,6 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
                     it.toTypedArray()
             )
         })
-
         binding.localitySpinner.onItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
@@ -63,7 +62,6 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
                     override fun onNothingSelected(p0: AdapterView<*>?) {}
                 }
 
-        binding.suburbSpinner.visibility = View.GONE
         searchViewModel.suburb.observe(viewLifecycleOwner, {
             val adapter: ArrayAdapter<String> = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, it.toTypedArray())
             binding.suburbAutoComplete.filters = arrayOf<InputFilter>(AllCaps())
@@ -89,7 +87,7 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
             )
         })
 
-        binding.operatorSpinner.onItemSelectedListener =
+       /* binding.operatorSpinner.onItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                         if (p2 != 0) {
@@ -97,7 +95,7 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
                         }
                     }
                     override fun onNothingSelected(p0: AdapterView<*>?) {}
-                }
+                }*/
 
         searchViewModel.liftingInfo.observe(viewLifecycleOwner, {
             if (it.isEmpty()) {
@@ -110,6 +108,7 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
 
 
         searchViewModel.onStart()
+        binding.searchButton.visibility = View.VISIBLE
         binding.searchButton.setOnClickListener(this)
         return binding.root
     }
