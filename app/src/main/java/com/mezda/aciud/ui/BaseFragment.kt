@@ -1,5 +1,6 @@
 package com.mezda.aciud.ui
 
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
@@ -28,5 +29,9 @@ abstract class BaseFragment: Fragment() {
 
     fun popBack() {
         Navigation.findNavController(requireView()).popBackStack()
+    }
+
+    fun toast(msg:String){
+        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
     }
 }

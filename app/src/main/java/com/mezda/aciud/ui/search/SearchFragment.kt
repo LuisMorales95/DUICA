@@ -20,6 +20,7 @@ import com.mezda.aciud.ui.MainActivity
 import com.mezda.aciud.utils.LiftingAdapter
 import com.mezda.aciud.utils.SuburbAutoCompleteValidator
 import com.mezda.aciud.utils.SuburbFocusListener
+import com.mezda.aciud.utils.dialogs.LoadingDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -29,6 +30,7 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
     private lateinit var liftingAdapter: LiftingAdapter
     private val searchViewModel by viewModels<SearchViewModel>()
     private var isAdmin = false
+    private lateinit var loadingDialog: LoadingDialog
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -43,6 +45,22 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
         binding.liftingRecycler.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         binding.liftingRecycler.setHasFixedSize(true)
         binding.localityTextView.text = Locality.getDefault().nameLocality
+
+        loadingDialog = LoadingDialog(requireActivity())
+
+        searchViewModel.loading.observe(viewLifecycleOwner,{
+            if (it){
+                loadingDialog.apply {
+                    show()
+                    binding.apply {
+                        this.messageText.text = "Enviando"
+                    }
+                }
+            } else {
+                loadingDialog.dismiss()
+            }
+        })
+
 
         searchViewModel.localities.observe(viewLifecycleOwner, {
             binding.localitySpinner.adapter = ArrayAdapter(
@@ -110,6 +128,7 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
         searchViewModel.onStart()
         binding.searchButton.visibility = View.VISIBLE
         binding.searchButton.setOnClickListener(this)
+        binding.addFloatingButton.setOnClickListener(this)
         return binding.root
     }
 
@@ -133,16 +152,21 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
                 if (isAdmin) {
                     if (binding.suburbAutoComplete.text.toString().isNotEmpty() && binding.operatorSpinner.selectedItemPosition != 0) {
                         searchViewModel.onSearch(binding.suburbAutoComplete.text.toString(), binding.operatorSpinner.selectedItemPosition, isAdmin)
+                        binding.suburbAutoComplete.setText("")
                     } else {
                         Toast.makeText(requireContext(), "Datos faltante", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     if (binding.suburbAutoComplete.text.toString().isNotEmpty()) {
                         searchViewModel.onSearch(binding.suburbAutoComplete.text.toString())
+                        binding.suburbAutoComplete.setText("")
                     } else {
                         Toast.makeText(requireContext(), "Datos faltante", Toast.LENGTH_SHORT).show()
                     }
                 }
+            }
+            binding.addFloatingButton.id -> {
+                findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToUserInfoFragment())
             }
         }
     }

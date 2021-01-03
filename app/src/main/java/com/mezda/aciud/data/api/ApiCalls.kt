@@ -64,4 +64,9 @@ interface ApiCalls {
     suspend fun getSupportType(
         @Query("pwdApp") password: String
     ): Response<List<SupportTypes>>
+
+    @GET("api/Consultas/GetBandera")
+    suspend fun getFlags(
+            @Query("pwdApp") password: String
+    ): Response<List<Flag>>
 }

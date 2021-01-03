@@ -21,6 +21,10 @@ class SearchViewModel @ViewModelInject constructor(
 
     var defaultPosition = 0
 
+    private val _loading = MutableLiveData<Boolean>()
+    val loading : LiveData<Boolean>
+        get() = _loading
+
     private var _localities = MutableLiveData<MutableList<Locality>>()
     val localities = Transformations.map(_localities) {
         val list = mutableListOf<String>()
@@ -155,6 +159,7 @@ class SearchViewModel @ViewModelInject constructor(
 
     fun onSearch(suburb: String, operatorPosition: Int = 0, isAdmin: Boolean = false) {
         ioThread.launch {
+            _loading.postValue(true)
             if (isAdmin) {
                 var subIndex = 0
                 _suburb.value?.forEachIndexed { index, suburbs ->
@@ -167,6 +172,7 @@ class SearchViewModel @ViewModelInject constructor(
                         _operatorList.value?.get(operatorPosition - 1)?.supervisorId ?: 0,
                         _operatorList.value?.get(operatorPosition - 1)?.operatorId ?: 0
                 )
+                _loading.postValue(false)
                 if (lifting.isSuccessful) {
                     _liftingData.postValue(lifting.body()?.toMutableList())
                 }
@@ -182,6 +188,7 @@ class SearchViewModel @ViewModelInject constructor(
                         operator.value?.supervisorId ?: 0,
                         operator.value?.operatorId ?: 0
                 )
+                _loading.postValue(false)
                 if (lifting.isSuccessful) {
                     _liftingData.postValue(lifting.body()?.toMutableList())
                 }

@@ -36,6 +36,8 @@ class LoginFragment : BaseFragment() {
             launchDirection(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
         }
 
+        binding.userTextInputLayout.editText?.setText("Admin")
+
         binding.startButton.setOnClickListener {
             val user = binding.userTextInputLayout.editText?.text?.toString() ?: ""
             if (user.isEmpty()) {

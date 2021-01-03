@@ -35,6 +35,9 @@
         <action
             android:id="@+id/action_searchFragment_to_mapsFragment"
             app:destination="@id/mapsFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_userInfoFragment"
+            app:destination="@id/liftingGraph" />
     </fragment>
     <fragment
         android:id="@+id/mapsFragment"
@@ -45,4 +48,53 @@
             android:name="liftingInfo"
             app:argType="com.mezda.aciud.data.models.LiftingInfo" />
     </fragment>
+    <navigation android:id="@+id/liftingGraph"
+        app:startDestination="@id/partyInfoFragment">
+        <fragment
+            android:id="@+id/userInfoFragment"
+            android:name="com.mezda.aciud.ui.lifting_flow.user_info.UserInfoFragment"
+            android:label="Levantamiento Paso 1"
+            tools:layout="@layout/fragment_user_info">
+            <action
+                android:id="@+id/action_userInfoFragment_to_addressInfoFragment"
+                app:destination="@id/addressInfoFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/addressInfoFragment"
+            android:name="com.mezda.aciud.ui.lifting_flow.address_info.AddressInfoFragment"
+            android:label="Levantamiento Paso 2"
+            tools:layout="@layout/fragment_address_info">
+            <action
+                android:id="@+id/action_addressInfoFragment_to_geoLocationInfoFragment"
+                app:destination="@id/geoLocationInfoFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/geoLocationInfoFragment"
+            android:name="com.mezda.aciud.ui.lifting_flow.geolocation_info.GeoLocationInfoFragment"
+            android:label="Levantamiento Paso 3"
+            tools:layout="@layout/fragment_geolocation_info" >
+            <action
+                android:id="@+id/action_geoLocationInfoFragment_to_occupationInfoFragment"
+                app:destination="@id/occupationInfoFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/occupationInfoFragment"
+            android:name="com.mezda.aciud.ui.lifting_flow.ocupation_info.OccupationInfoFragment"
+            android:label="Levantamiento Paso 4"
+            tools:layout="@layout/fragment_occupation">
+            <action
+                android:id="@+id/action_occupationInfoFragment_to_partyInfoFragment"
+                app:destination="@id/partyInfoFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/partyInfoFragment"
+            android:name="com.mezda.aciud.ui.lifting_flow.party_info.PartyInfoFragment"
+            android:label="PartyInfoFragment"
+            tools:layout="@layout/fragment_party">
+            <action
+                android:id="@+id/action_partyInfoFragment_to_searchFragment"
+                app:destination="@id/searchFragment"
+                app:popUpTo="@id/searchFragment" />
+        </fragment>
+    </navigation>
 </navigation>
