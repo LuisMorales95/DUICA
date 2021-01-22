@@ -43,7 +43,9 @@ data class LiftingInfo(
     @SerializedName("Observaciones")
     var observations: String? = null,
     @SerializedName("Simpatizante")
-    var sympathizer: Boolean? = null,
+    var sympathizer: Int? = null,
+    @SerializedName("Idbandera")
+    var idFlag: Int? = null,
     @SerializedName("Imagen")
     var image: String? = null
 ) : Parcelable {
@@ -66,7 +68,8 @@ data class LiftingInfo(
         parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readString(),
-        parcel.readValue(Boolean::class.java.classLoader) as? Boolean,
+        parcel.readValue(Int::class.java.classLoader) as? Int,
+        parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readString()
     ) {
     }
@@ -91,6 +94,7 @@ data class LiftingInfo(
         parcel.writeValue(supportTypeId)
         parcel.writeString(observations)
         parcel.writeValue(sympathizer)
+        parcel.writeValue(idFlag)
         parcel.writeString(image)
     }
 
@@ -107,25 +111,5 @@ data class LiftingInfo(
             return arrayOfNulls(size)
         }
     }
-}
 
-/*
- "Seccion": "sample string 14",
-  "Idseccion": 15
-
-{
-  "Idlevantamiento": 1,
-  "Idcolonia": 2,
-  "Idresponsable": 3,
-  "Idoperador": 4,
-  "Nombre": "sample string 5",
-  "ApellidoPaterno": "sample string 6",
-  "ApellinoMaterno": "sample string 7",
-  "Telefono": "sample string 8",
-  "Calle": "sample string 9",
-  "Numero": "sample string 10",
-  "Latitude": "sample string 11",
-  "Longitude": "sample string 12",
-  "Fecha": "2020-12-01T20:15:06.3184436-06:00"
 }
-*/

@@ -7,39 +7,14 @@ import com.mezda.aciud.data.models.*
 import com.mezda.aciud.data.repository.main.MainRepositoryImpl
 import com.mezda.aciud.data.repository.search.SearchRepositoryImpl
 import com.mezda.aciud.ui.BaseViewModel
-import com.mezda.aciud.utils.ValueWrapper
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Response
-import timber.log.Timber
 
 class SearchViewModel @ViewModelInject constructor(
-        @Assisted private val savedStateHandle: SavedStateHandle,
-        private val mainRepositoryImpl: MainRepositoryImpl,
-        private val searchRepositoryImpl: SearchRepositoryImpl
+    @Assisted private val savedStateHandle: SavedStateHandle,
+    private val mainRepositoryImpl: MainRepositoryImpl,
+    private val searchRepositoryImpl: SearchRepositoryImpl
 ) : BaseViewModel() {
-
-    var defaultPosition = 0
-
-    private var _localities = MutableLiveData<MutableList<Locality>>()
-    val localities = Transformations.map(_localities) {
-        val list = mutableListOf<String>()
-        list.add("Selecciona un localidad")
-        it.forEach { locality ->
-            list.add(locality.nameLocality ?: "")
-        }
-        list
-    }
-
-    private var _suburb = MutableLiveData<MutableList<Suburb>>()
-    val suburb = Transformations.map(_suburb) {
-        val list = mutableListOf<String>()
-        list.add("Selecciona una colonia")
-        it.forEach { sub ->
-            list.add(sub.nameSuburb ?: "")
-        }
-        list
-    }
 
     private var _operator = mainRepositoryImpl.liveOperator
     val operator: LiveData<Operators>
@@ -53,70 +28,29 @@ class SearchViewModel @ViewModelInject constructor(
     fun onStart() {
         ioThread.launch {
             _liftingData.postValue(mutableListOf())
-            _localities.postValue(mutableListOf())
-            _suburb.postValue(mutableListOf())
             findLifting()
-            onGetSearchSuburbs()
-//            onGetSearchSuburbs()
-//            val locality = getLocalities()
-//            if (locality.isSuccessful) {
-//                _localities.postValue(locality.body()?.toMutableList())
-//            }
         }
     }
 
-    private suspend fun getLocalities(): Response<List<Locality>> {
-        return searchRepositoryImpl.getLocalities()
-    }
-
-    fun searchSuburbs(i: Int) {
+    private fun findLifting() {
         ioThread.launch {
-            val sub = getSuburb(_localities.value?.get(i)?.idLocality ?: 0)
-            if (sub.isSuccessful) {
-                _suburb.postValue(sub.body()?.toMutableList())
+            val lifting = getLifting(
+                "null", _operator.value?.supervisorId
+                    ?: 0, _operator.value?.operatorId ?: 0
+            )
+            if (lifting.isSuccessful) {
+                _liftingData.postValue(lifting.body()?.toMutableList())
             }
         }
     }
 
-    fun onGetSearchSuburbs() {
-        ioThread.launch {
-            val sub = getSuburb(Locality.getDefault().idLocality ?: 0)
-            if (sub.isSuccessful) {
-                _suburb.postValue(sub.body()?.toMutableList())
-            }
-        }
-    }
-
-    private suspend fun getSuburb(idLocality: Int): Response<List<Suburb>> {
-        return searchRepositoryImpl.getSuburbs(idLocality)
-    }
-
-    suspend fun getLifting(suburb: Int, idResponsible: Int, idOperator: Int): Response<List<LiftingInfo>> {
+    private suspend fun getLifting(
+        suburb: String?,
+        idResponsible: Int,
+        idOperator: Int
+    ): Response<List<LiftingInfo>> {
         return searchRepositoryImpl.getLifting(suburb, idResponsible, idOperator)
     }
-
-    fun findLifting() {
-        ioThread.launch {
-            val lifting = getLifting(0, _operator.value?.supervisorId
-                    ?: 0, _operator.value?.operatorId ?: 0)
-            if (lifting.isSuccessful) {
-                _liftingData.postValue(lifting.body()?.toMutableList())
-            }
-        }
-    }
-
-    fun searchLifting(minus: Int) {
-        ioThread.launch {
-            defaultPosition = minus
-            val suburbSelected = _suburb.value?.get(minus)
-            val lifting = getLifting(suburbSelected?.idSuburb ?: 0, _operator.value?.supervisorId
-                    ?: 0, _operator.value?.operatorId ?: 0)
-            if (lifting.isSuccessful) {
-                _liftingData.postValue(lifting.body()?.toMutableList())
-            }
-        }
-    }
-
 
     private var _operatorList = MutableLiveData<MutableList<Operators>>()
     val operatorList = Transformations.map(_operatorList) {
@@ -142,45 +76,22 @@ class SearchViewModel @ViewModelInject constructor(
         return searchRepositoryImpl.getOperators()
     }
 
-    fun onSearchLifting(operatorPosition: Int) {
-        ioThread.launch {
-            val operators = _operatorList.value?.get(operatorPosition - 1)
-            val lifting = getLifting(0, operators?.supervisorId
-                    ?: 0, operators?.operatorId ?: 0)
-            if (lifting.isSuccessful) {
-                _liftingData.postValue(lifting.body()?.toMutableList())
-            }
-        }
-    }
-
-    fun onSearch(suburb: String, operatorPosition: Int = 0, isAdmin: Boolean = false) {
+    fun onSearch(operatorPosition: Int = 0, isAdmin: Boolean = false) {
         ioThread.launch {
             if (isAdmin) {
-                var subIndex = 0
-                _suburb.value?.forEachIndexed { index, suburbs ->
-                    if (suburbs.nameSuburb == suburb) {
-                        subIndex = index
-                    }
-                }
                 val lifting = getLifting(
-                        _suburb.value?.get(subIndex)?.idSuburb ?: 0,
-                        _operatorList.value?.get(operatorPosition - 1)?.supervisorId ?: 0,
-                        _operatorList.value?.get(operatorPosition - 1)?.operatorId ?: 0
+                    "null",
+                    _operatorList.value?.get(operatorPosition - 1)?.supervisorId ?: 0,
+                    _operatorList.value?.get(operatorPosition - 1)?.operatorId ?: 0
                 )
                 if (lifting.isSuccessful) {
                     _liftingData.postValue(lifting.body()?.toMutableList())
                 }
             } else {
-                var subIndex = 0
-                _suburb.value?.forEachIndexed { index, suburbs ->
-                    if (suburbs.nameSuburb == suburb) {
-                        subIndex = index
-                    }
-                }
                 val lifting = getLifting(
-                        _suburb.value?.get(subIndex)?.idSuburb ?: 0,
-                        operator.value?.supervisorId ?: 0,
-                        operator.value?.operatorId ?: 0
+                    "null",
+                    operator.value?.supervisorId ?: 0,
+                    operator.value?.operatorId ?: 0
                 )
                 if (lifting.isSuccessful) {
                     _liftingData.postValue(lifting.body()?.toMutableList())

@@ -44,38 +44,13 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
         binding.liftingRecycler.setHasFixedSize(true)
         binding.localityTextView.text = Locality.getDefault().nameLocality
 
-        searchViewModel.localities.observe(viewLifecycleOwner, {
-            binding.localitySpinner.adapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_list_item_1,
-                    it.toTypedArray()
-            )
-        })
-        binding.localitySpinner.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                        if (p2 != 0) {
-                            searchViewModel.searchSuburbs(p2.minus(1))
-                        }
-                    }
-
-                    override fun onNothingSelected(p0: AdapterView<*>?) {}
-                }
-
-        searchViewModel.suburb.observe(viewLifecycleOwner, {
-            val adapter: ArrayAdapter<String> = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, it.toTypedArray())
-            binding.suburbAutoComplete.filters = arrayOf<InputFilter>(AllCaps())
-            binding.suburbAutoComplete.setAdapter(adapter)
-            binding.suburbAutoComplete.validator = SuburbAutoCompleteValidator(it)
-            binding.suburbAutoComplete.onFocusChangeListener = SuburbFocusListener()
-        })
-
         searchViewModel.operator.observe(viewLifecycleOwner, {
             (requireActivity() as MainActivity).supportActionBar?.title = it.name
             if (it.name == "Administrador") {
                 isAdmin = true
                 binding.operatorSpinner.visibility = View.VISIBLE
                 searchViewModel.onOperator()
+                binding.searchButton.visibility = View.VISIBLE
             }
         })
 
@@ -86,16 +61,6 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
                     it.toTypedArray()
             )
         })
-
-       /* binding.operatorSpinner.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                        if (p2 != 0) {
-                            searchViewModel.onSearchLifting(p2)
-                        }
-                    }
-                    override fun onNothingSelected(p0: AdapterView<*>?) {}
-                }*/
 
         searchViewModel.liftingInfo.observe(viewLifecycleOwner, {
             if (it.isEmpty()) {
@@ -108,7 +73,6 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
 
 
         searchViewModel.onStart()
-        binding.searchButton.visibility = View.VISIBLE
         binding.searchButton.setOnClickListener(this)
         return binding.root
     }
@@ -131,17 +95,13 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
         when(p0?.id){
             binding.searchButton.id -> {
                 if (isAdmin) {
-                    if (binding.suburbAutoComplete.text.toString().isNotEmpty() && binding.operatorSpinner.selectedItemPosition != 0) {
-                        searchViewModel.onSearch(binding.suburbAutoComplete.text.toString(), binding.operatorSpinner.selectedItemPosition, isAdmin)
+                    if (binding.operatorSpinner.selectedItemPosition != 0) {
+                        searchViewModel.onSearch(binding.operatorSpinner.selectedItemPosition, isAdmin)
                     } else {
                         Toast.makeText(requireContext(), "Datos faltante", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    if (binding.suburbAutoComplete.text.toString().isNotEmpty()) {
-                        searchViewModel.onSearch(binding.suburbAutoComplete.text.toString())
-                    } else {
-                        Toast.makeText(requireContext(), "Datos faltante", Toast.LENGTH_SHORT).show()
-                    }
+                        searchViewModel.onSearch()
                 }
             }
         }

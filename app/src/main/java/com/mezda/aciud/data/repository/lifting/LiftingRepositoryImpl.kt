@@ -16,6 +16,7 @@ class LiftingRepositoryImpl(
     private val apiCalls: ApiCalls,
     private val preference: Preference
 ) {
+
     suspend fun getSupervisors(): Response<List<Supervisor>> {
         return apiCalls.getSupervisors(preference.pwdApp())
     }
@@ -37,26 +38,27 @@ class LiftingRepositoryImpl(
         val response = apiCalls.getSection(preference.pwdApp())
         return if (response.isSuccessful) {
             response.body() ?: listOf()
-        } else {
-            listOf()
-        }
+        } else listOf()
     }
 
     suspend fun getProfession(): List<Profession> {
         val response = apiCalls.getProfession(preference.pwdApp())
         return if (response.isSuccessful) {
             response.body() ?: listOf()
-        } else {
-            listOf()
-        }
+        } else listOf()
     }
 
     suspend fun getSupportType(): List<SupportTypes>{
         val response = apiCalls.getSupportType(preference.pwdApp())
         return if (response.isSuccessful) {
             response.body() ?: listOf()
-        } else {
-            listOf()
-        }
+        } else listOf()
+    }
+
+    suspend fun getFlags(): List<Flag> {
+        val response = apiCalls.getFlags(preference.pwdApp())
+        return if (response.isSuccessful) {
+            response.body() ?: listOf()
+        } else listOf()
     }
 }

@@ -75,6 +75,16 @@ class LiftingViewModel @ViewModelInject constructor(
         list
     }
 
+    private val _flags = MutableLiveData<List<Flag>>()
+    val flags = Transformations.map(_flags){ flags ->
+        val list = mutableListOf<String>()
+        list.add("Selecciona un Estado")
+        flags.forEach { flag ->
+            list.add(flag.flag ?: "")
+        }
+        list
+    }
+
     private val _supervisor = MutableLiveData<Supervisor>()
     val supervisor: LiveData<Supervisor>
         get() = _supervisor
@@ -187,6 +197,7 @@ class LiftingViewModel @ViewModelInject constructor(
             sectionName: String,
             profession: Int,
             supportTypes: Int,
+            flag: Int,
             observations: String,
             sympathizer: Boolean,
             image: String?
@@ -213,8 +224,9 @@ class LiftingViewModel @ViewModelInject constructor(
                 }
             }
 
-            val professionId = _profession.value?.get(profession - 1)?.id ?: 0
-            val supportTypesId = _supportType.value?.get(supportTypes - 1)?.id ?: 0
+            val professionId = _profession.value?.get(profession.minus(1))?.id ?: 0
+            val supportTypesId = _supportType.value?.get(supportTypes.minus(1))?.id ?: 0
+            val flagId = _flags.value?.get(flag.minus(1))?.id ?: 0
 
             val liftingInfo = LiftingInfo()
             liftingInfo.name = name
@@ -228,14 +240,15 @@ class LiftingViewModel @ViewModelInject constructor(
             liftingInfo.idSuburb = _suburb.value?.get(suburbIndex)?.idSuburb ?: 0
             liftingInfo.idOperator = _operator.value?.operatorId
             liftingInfo.idSupervisor = _operator.value?.supervisorId
-            liftingInfo.date = Date(System.currentTimeMillis()).toString()
+//            liftingInfo.date = Date(System.currentTimeMillis()).toString()
             liftingInfo.section = _section.value?.get(sectionId)?.section
             liftingInfo.sectionId = _section.value?.get(sectionId)?.idSection
             liftingInfo.professionId = professionId
             liftingInfo.supportTypeId = supportTypesId
             liftingInfo.observations = observations
-            liftingInfo.sympathizer = sympathizer
-            liftingInfo.image = image
+            liftingInfo.sympathizer = if (sympathizer) 1 else 2
+            liftingInfo.idFlag = flagId
+            liftingInfo.image = image ?: "null"
 
 
             val response = sendInfo(liftingInfo)
@@ -270,6 +283,12 @@ class LiftingViewModel @ViewModelInject constructor(
     fun onGetSupportType() {
         ioThread.launch {
             _supportType.postValue(liftingRepositoryImpl.getSupportType())
+        }
+    }
+
+    fun onGetFlags() {
+        ioThread.launch {
+            _flags.postValue(liftingRepositoryImpl.getFlags())
         }
     }
 }

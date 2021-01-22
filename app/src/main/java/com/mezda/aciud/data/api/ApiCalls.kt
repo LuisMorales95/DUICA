@@ -12,7 +12,9 @@ import retrofit2.http.Query
 interface ApiCalls {
 
     @GET("api/Operadores")
-    suspend fun getOperators(@Query("pwdApp") password: String): Response<List<Operators>>
+    suspend fun getOperators(
+        @Query("pwdApp") password: String
+    ): Response<List<Operators>>
 
     @POST("api/Operadores")
     suspend fun postOperator(
@@ -21,11 +23,14 @@ interface ApiCalls {
     ): Response<Int>
 
     @GET("api/ResponsableSeccion")
-    suspend fun getSupervisors(@Query("pwdApp") password: String): Response<List<Supervisor>>
+    suspend fun getSupervisors(
+        @Query("pwdApp") password: String
+    ): Response<List<Supervisor>>
 
     @GET("api/Consultas/GetLocalidad")
-    suspend fun getLocalities(@Query("pwdApp") password: String): Response<List<Locality>>
-
+    suspend fun getLocalities(
+        @Query("pwdApp") password: String
+    ): Response<List<Locality>>
 
     @GET("api/Consultas/GetColonia")
     suspend fun getSuburbs(
@@ -39,19 +44,19 @@ interface ApiCalls {
         @Body body: RequestBody
     ): Response<Int>
 
-    @GET("api/Levantamiento")
+    @GET("api/Consultas/GetLevantamiento")
     suspend fun getLifting(
         @Query("pwdApp") password: String,
-        @Query("idcolonia") suburb: Int,
+        @Query("idcolonia") suburb: String?,
         @Query("idresponsable") idResponsible: Int,
         @Query("idoperador") idOperator: Int
     ): Response<List<LiftingInfo>>
 
     @GET("api/Consultas/GetSeccion")
     suspend fun getSection(
-            @Query("pwdApp") password: String,
-            @Query("idseccion") idSection: String = "null",
-            @Query("seccion") section: String = "null",
+        @Query("pwdApp") password: String,
+        @Query("idseccion") idSection: String = "null",
+        @Query("seccion") section: String = "null",
     ): Response<List<Section>>
 
     @GET("api/Consultas/GetProfesion")
@@ -64,4 +69,9 @@ interface ApiCalls {
     suspend fun getSupportType(
         @Query("pwdApp") password: String
     ): Response<List<SupportTypes>>
+
+    @GET("api/Consultas/GetBandera")
+    suspend fun getFlags(
+        @Query("pwdApp") password: String
+    ): Response<List<Flag>>
 }
