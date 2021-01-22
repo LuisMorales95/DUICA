@@ -7,88 +7,61 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/small_margin"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/locality_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/medium_margin"
+            android:gravity="center"
+            android:padding="@dimen/medium_padding"
+            android:text="@string/locality"
+            android:textStyle="bold"
+            tools:text="@string/locality" />
+
+        <Spinner
+            android:id="@+id/locality_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:listitem="@android:layout/simple_dropdown_item_1line" />
+
+        <Spinner
+            android:id="@+id/suburb_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:listitem="@android:layout/simple_dropdown_item_1line" />
+
+        <Spinner
+            android:id="@+id/operator_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:listitem="@android:layout/simple_dropdown_item_1line" />
+
+        <Button
+            android:id="@+id/search_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text="@string/search" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/lifting_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="@dimen/small_margin"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_marginTop="@dimen/medium_margin" />
 
-            <TextView
-                android:id="@+id/locality_textView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/medium_margin"
-                android:gravity="center"
-                android:padding="@dimen/medium_padding"
-                android:text="@string/locality"
-                android:textStyle="bold"
-                tools:text="@string/locality" />
-
-            <Spinner
-                android:id="@+id/locality_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                tools:listitem="@android:layout/simple_dropdown_item_1line" />
-
-            <Spinner
-                android:id="@+id/suburb_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                tools:listitem="@android:layout/simple_dropdown_item_1line" />
-
-            <AutoCompleteTextView
-                android:id="@+id/suburb_auto_complete"
-                style="@style/Widget.AppCompat.EditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/suburb"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="@dimen/edittext_vertical_size"
-                android:textSize="16sp" />
-
-            <Spinner
-                android:id="@+id/operator_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                tools:visibility="visible"
-                tools:listitem="@android:layout/simple_dropdown_item_1line" />
-
-            <Button
-                android:id="@+id/search_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="@string/search" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/lifting_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/medium_margin" />
-
-
-        </LinearLayout>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/add_floating_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:clickable="true"
-            android:tint="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_add" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </layout>

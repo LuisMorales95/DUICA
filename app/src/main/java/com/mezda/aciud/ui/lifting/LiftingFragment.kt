@@ -89,8 +89,6 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
             )
         })
 
-
-
         liftingViewModel.suburb.observe(viewLifecycleOwner, {
             val adapter: ArrayAdapter<String> = ArrayAdapter(
                     requireContext(),
@@ -120,6 +118,7 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
             binding.sectionAutoComplete.onFocusChangeListener = SectionFocusListener()
         }
 
+
         liftingViewModel.profession.observe(viewLifecycleOwner) {
             binding.professionSpinner.adapter = ArrayAdapter(
                     requireContext(),
@@ -136,6 +135,13 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
             )
         }
 
+        liftingViewModel.flags.observe(viewLifecycleOwner) {
+            binding.flagSpinner.adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                it.toTypedArray()
+            )
+        }
         liftingViewModel.supervisor.observe(viewLifecycleOwner, {
             Timber.e("supervisor ${Gson().toJson(it)}")
             binding.supervisorText.text = it?.name
@@ -179,6 +185,7 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
         liftingViewModel.onGetSections()
         liftingViewModel.onGetProfessions()
         liftingViewModel.onGetSupportType()
+        liftingViewModel.onGetFlags()
 
         gpsTracker.location()
         return binding.root
@@ -218,6 +225,7 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
                             binding.sectionAutoComplete.text.toString(),
                             binding.professionSpinner.selectedItemPosition,
                             binding.supportTypeSpinner.selectedItemPosition,
+                            binding.flagSpinner.selectedItemPosition,
                             binding.observationsTextArea.text.toString(),
                             sympathizer_enabled,
                             photoEncoded
@@ -274,6 +282,11 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
                         .show()
                 false
             }
+            binding.flagSpinner.selectedItemPosition == 0 -> {
+                Toast.makeText(requireContext(), "Estado faltante", Toast.LENGTH_SHORT)
+                    .show()
+                false
+            }
             binding.latitudeText.text.toString().isEmpty() || binding.longitudeText.text.toString()
                     .isEmpty() -> {
                 Toast.makeText(requireContext(), "Ubicacion GPS Requerida", Toast.LENGTH_SHORT)
@@ -282,11 +295,6 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
             }
             binding.sectionAutoComplete.text.toString().isEmpty() -> {
                 binding.sectionAutoComplete.error = "Requerido"
-                false
-            }
-            photoUri == null -> {
-                Toast.makeText(requireContext(), "Sin foto", Toast.LENGTH_SHORT)
-                        .show()
                 false
             }
             else -> true

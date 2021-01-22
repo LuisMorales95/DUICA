@@ -20,7 +20,6 @@ import com.mezda.aciud.ui.MainActivity
 import com.mezda.aciud.utils.LiftingAdapter
 import com.mezda.aciud.utils.SuburbAutoCompleteValidator
 import com.mezda.aciud.utils.SuburbFocusListener
-import com.mezda.aciud.utils.dialogs.LoadingDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,7 +29,6 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
     private lateinit var liftingAdapter: LiftingAdapter
     private val searchViewModel by viewModels<SearchViewModel>()
     private var isAdmin = false
-    private lateinit var loadingDialog: LoadingDialog
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -46,54 +44,13 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
         binding.liftingRecycler.setHasFixedSize(true)
         binding.localityTextView.text = Locality.getDefault().nameLocality
 
-        loadingDialog = LoadingDialog(requireActivity())
-
-        searchViewModel.loading.observe(viewLifecycleOwner,{
-            if (it){
-                loadingDialog.apply {
-                    show()
-                    binding.apply {
-                        this.messageText.text = "Enviando"
-                    }
-                }
-            } else {
-                loadingDialog.dismiss()
-            }
-        })
-
-
-        searchViewModel.localities.observe(viewLifecycleOwner, {
-            binding.localitySpinner.adapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_list_item_1,
-                    it.toTypedArray()
-            )
-        })
-        binding.localitySpinner.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                        if (p2 != 0) {
-                            searchViewModel.searchSuburbs(p2.minus(1))
-                        }
-                    }
-
-                    override fun onNothingSelected(p0: AdapterView<*>?) {}
-                }
-
-        searchViewModel.suburb.observe(viewLifecycleOwner, {
-            val adapter: ArrayAdapter<String> = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, it.toTypedArray())
-            binding.suburbAutoComplete.filters = arrayOf<InputFilter>(AllCaps())
-            binding.suburbAutoComplete.setAdapter(adapter)
-            binding.suburbAutoComplete.validator = SuburbAutoCompleteValidator(it)
-            binding.suburbAutoComplete.onFocusChangeListener = SuburbFocusListener()
-        })
-
         searchViewModel.operator.observe(viewLifecycleOwner, {
             (requireActivity() as MainActivity).supportActionBar?.title = it.name
             if (it.name == "Administrador") {
                 isAdmin = true
                 binding.operatorSpinner.visibility = View.VISIBLE
                 searchViewModel.onOperator()
+                binding.searchButton.visibility = View.VISIBLE
             }
         })
 
@@ -104,16 +61,6 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
                     it.toTypedArray()
             )
         })
-
-       /* binding.operatorSpinner.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                        if (p2 != 0) {
-                            searchViewModel.onSearchLifting(p2)
-                        }
-                    }
-                    override fun onNothingSelected(p0: AdapterView<*>?) {}
-                }*/
 
         searchViewModel.liftingInfo.observe(viewLifecycleOwner, {
             if (it.isEmpty()) {
@@ -126,9 +73,7 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
 
 
         searchViewModel.onStart()
-        binding.searchButton.visibility = View.VISIBLE
         binding.searchButton.setOnClickListener(this)
-        binding.addFloatingButton.setOnClickListener(this)
         return binding.root
     }
 
@@ -150,23 +95,14 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
         when(p0?.id){
             binding.searchButton.id -> {
                 if (isAdmin) {
-                    if (binding.suburbAutoComplete.text.toString().isNotEmpty() && binding.operatorSpinner.selectedItemPosition != 0) {
-                        searchViewModel.onSearch(binding.suburbAutoComplete.text.toString(), binding.operatorSpinner.selectedItemPosition, isAdmin)
-                        binding.suburbAutoComplete.setText("")
+                    if (binding.operatorSpinner.selectedItemPosition != 0) {
+                        searchViewModel.onSearch(binding.operatorSpinner.selectedItemPosition, isAdmin)
                     } else {
                         Toast.makeText(requireContext(), "Datos faltante", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    if (binding.suburbAutoComplete.text.toString().isNotEmpty()) {
-                        searchViewModel.onSearch(binding.suburbAutoComplete.text.toString())
-                        binding.suburbAutoComplete.setText("")
-                    } else {
-                        Toast.makeText(requireContext(), "Datos faltante", Toast.LENGTH_SHORT).show()
-                    }
+                        searchViewModel.onSearch()
                 }
-            }
-            binding.addFloatingButton.id -> {
-                findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToUserInfoFragment())
             }
         }
     }

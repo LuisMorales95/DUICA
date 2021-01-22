@@ -221,7 +221,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Simpatizante 4T"
@@ -231,8 +231,16 @@
                     <Switch
                         android:id="@+id/sympathizer_switch"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        tools:ignore="UseSwitchCompatOrMaterialXml" />
                 </LinearLayout>
+
+                <Spinner
+                    android:id="@+id/flag_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/medium_margin"
+                    tools:listitem="@android:layout/simple_dropdown_item_1line" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

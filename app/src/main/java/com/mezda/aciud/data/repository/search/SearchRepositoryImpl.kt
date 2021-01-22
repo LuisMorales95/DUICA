@@ -21,7 +21,7 @@ class SearchRepositoryImpl(
     }
 
     suspend fun getLifting(
-        suburb: Int, idResponsible: Int, idOperator: Int
+        suburb: String?, idResponsible: Int, idOperator: Int
     ): Response<List<LiftingInfo>> {
         return apiCalls.getLifting(password = preference.pwdApp(), idResponsible = idResponsible, idOperator =  idOperator, suburb = suburb)
     }
