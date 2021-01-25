@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.mezda.aciud.ui.lifting
 
 import android.app.Activity.RESULT_OK
@@ -218,7 +220,6 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
                             binding.phoneNumberText.editText?.text.toString(),
                             binding.streetText.editText?.text.toString(),
                             binding.streetNumberText.editText?.text.toString(),
-                            binding.localitySpinner.selectedItemPosition,
                             binding.suburbAutoComplete.text.toString(),
                             binding.latitudeText.text.toString(),
                             binding.longitudeText.text.toString(),

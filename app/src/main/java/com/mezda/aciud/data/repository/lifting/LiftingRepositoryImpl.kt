@@ -59,13 +59,6 @@ class LiftingRepositoryImpl(
         val response = apiCalls.getFlags(preference.pwdApp())
         return if (response.isSuccessful) {
             response.body() ?: listOf()
-        } else listOf()
-    }
-
-    suspend fun getFlags(): List<Flag> {
-        val response = apiCalls.getFlags(preference.pwdApp())
-        return if (response.isSuccessful) {
-            response.body() ?: listOf()
         } else {
             listOf()
         }

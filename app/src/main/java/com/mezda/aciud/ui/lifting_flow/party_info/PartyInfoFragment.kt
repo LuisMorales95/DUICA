@@ -13,10 +13,11 @@ import com.mezda.aciud.ui.BaseFragment
 import com.mezda.aciud.ui.lifting_flow.LiftingFlowViewModel
 import com.mezda.aciud.ui.lifting_flow.LiftingFlowViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PartyInfoFragment: BaseFragment(), View.OnClickListener {
+class PartyInfoFragment : BaseFragment(), View.OnClickListener {
 
     @Inject
     lateinit var factory: LiftingFlowViewModelProvider
@@ -26,20 +27,21 @@ class PartyInfoFragment: BaseFragment(), View.OnClickListener {
 
     lateinit var binding: FragmentPartyBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_party, container,false)
-        viewModel.flag.observe(viewLifecycleOwner,{
-                binding.flagSpinner.adapter = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_list_item_1,
-                        it.toTypedArray()
-                )
-//                val professionPosition = viewModel.getProfessionIndex()
-//                if (professionPosition != 0) binding.professionSpinner.setSelection(professionPosition)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_party, container, false)
+
+        viewModel.flag.observe(viewLifecycleOwner, {
+            binding.flagSpinner.adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                it.toTypedArray()
+            )
         })
-        binding.optionsRadio.setOnCheckedChangeListener { radioGroup, i ->
-            toast("radio selected: ${radioGroup.checkedRadioButtonId} $i")
-        }
+
         viewModel.getFlags()
         binding.nextButton.setOnClickListener(this)
         return binding.root
@@ -48,16 +50,37 @@ class PartyInfoFragment: BaseFragment(), View.OnClickListener {
     override fun onClick(p0: View?) {
         when (p0?.id) {
             binding.nextButton.id -> {
-                if (validateRequiredInfo()){
+                if (validateRequiredInfo()) {
+                    viewModel.savePartyInfo(
+                        getSympathizerOptionValue(),
+                        binding.flagSpinner.selectedItemPosition
+                    )
                     launchDirection(PartyInfoFragmentDirections.actionPartyInfoFragmentToSearchFragment())
-                } else {
-                    toast("Información Requerida")
                 }
             }
         }
     }
 
-    private fun validateRequiredInfo(): Boolean{
-        return false
+    private fun validateRequiredInfo(): Boolean {
+        return when {
+            binding.optionsRadio.checkedRadioButtonId == -1 -> {
+                toast("Estatus requerido")
+                false
+            }
+            binding.flagSpinner.selectedItemPosition == 0 -> {
+                toast("Bandera Requerida")
+                false
+            }
+            else -> true
+        }
+    }
+
+    private fun getSympathizerOptionValue(): Int {
+        return when (binding.optionsRadio.checkedRadioButtonId) {
+            binding.noRadio.id -> 1
+            binding.yesRadio.id -> 2
+            binding.fanRadio.id -> 3
+            else -> 1
+        }
     }
 }

@@ -40,8 +40,11 @@ class LiftingAdapter(private val liftingListener: LiftingListener) : RecyclerVie
         fun bind(liftingInfo: LiftingInfo, liftingListener: LiftingListener) {
             binding.textView2.text = "${liftingInfo.name} ${liftingInfo.paternal_surname} ${liftingInfo.maternal_surname}"
             binding.textView3.text = "${liftingInfo.number} ${liftingInfo.street}"
-            binding.root.setOnClickListener {
-                liftingListener.onClick(liftingInfo)
+            binding.imageMap.setOnClickListener {
+                liftingListener.onMap(liftingInfo)
+            }
+            binding.imageEdit.setOnClickListener {
+                liftingListener.onEdit(liftingInfo)
             }
         }
     }
@@ -51,7 +54,12 @@ class LiftingAdapter(private val liftingListener: LiftingListener) : RecyclerVie
         notifyDataSetChanged()
     }
 
-    class LiftingListener( val listener: (LiftingInfo) -> Unit) {
-        fun onClick(liftingInfo: LiftingInfo) = listener(liftingInfo)
+    fun getCurrentItems(): MutableList<LiftingInfo> {
+        return this.list
+    }
+
+    class LiftingListener(val editListener: (LiftingInfo) -> Unit, val mapListener: (LiftingInfo) -> Unit) {
+        fun onEdit(liftingInfo: LiftingInfo) = editListener(liftingInfo)
+        fun onMap(liftingInfo: LiftingInfo) = mapListener(liftingInfo)
     }
 }

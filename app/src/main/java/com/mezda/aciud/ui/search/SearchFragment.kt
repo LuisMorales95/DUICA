@@ -13,7 +13,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mezda.aciud.R
+import com.mezda.aciud.data.models.LiftingInfo
 import com.mezda.aciud.data.models.Locality
+import com.mezda.aciud.data.models.Locations
 import com.mezda.aciud.databinding.FragmentSearchBinding
 import com.mezda.aciud.ui.BaseFragment
 import com.mezda.aciud.ui.MainActivity
@@ -22,6 +24,7 @@ import com.mezda.aciud.utils.SuburbAutoCompleteValidator
 import com.mezda.aciud.utils.SuburbFocusListener
 import dagger.hilt.android.AndroidEntryPoint
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class SearchFragment : BaseFragment(), View.OnClickListener {
 
@@ -31,16 +34,26 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
     private var isAdmin = false
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
         setHasOptionsMenu(true)
-        liftingAdapter = LiftingAdapter(LiftingAdapter.LiftingListener {
-            launchDirection(SearchFragmentDirections.actionSearchFragmentToMapsFragment(it))
-        })
+        liftingAdapter = LiftingAdapter(
+            LiftingAdapter.LiftingListener(editListener = { info: LiftingInfo ->
+
+            }, mapListener = { info: LiftingInfo ->
+                val locations = Locations(mutableListOf(info), singleLocation = true)
+                launchDirection(
+                    SearchFragmentDirections.actionSearchFragmentToMapsFragment(
+                        locations
+                    )
+                )
+            })
+        )
         binding.liftingRecycler.adapter = liftingAdapter
-        binding.liftingRecycler.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+        binding.liftingRecycler.layoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         binding.liftingRecycler.setHasFixedSize(true)
         binding.localityTextView.text = Locality.getDefault().nameLocality
 
@@ -56,16 +69,18 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
 
         searchViewModel.operatorList.observe(viewLifecycleOwner, {
             binding.operatorSpinner.adapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_list_item_1,
-                    it.toTypedArray()
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                it.toTypedArray()
             )
         })
 
         searchViewModel.liftingInfo.observe(viewLifecycleOwner, {
             if (it.isEmpty()) {
-                binding.liftingRecycler.setBackgroundColor(resources.getColor(android.R.color.darker_gray))
+                binding.mapList.visibility = View.GONE
+                binding.liftingRecycler.setBackgroundColor(resources.getColor(R.color.light_gray))
             } else {
+                binding.mapList.visibility = View.VISIBLE
                 binding.liftingRecycler.setBackgroundColor(resources.getColor(R.color.white))
             }
             liftingAdapter.submit(it)
@@ -74,6 +89,7 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
 
         searchViewModel.onStart()
         binding.searchButton.setOnClickListener(this)
+        binding.mapList.setOnClickListener(this)
         return binding.root
     }
 
@@ -87,22 +103,35 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
             R.id.action_add -> {
                 findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToLiftingFragment())
             }
+            R.id.action_flow -> {
+                findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToUserInfoFragment())
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun onClick(p0: View?) {
-        when(p0?.id){
+        when (p0?.id) {
             binding.searchButton.id -> {
                 if (isAdmin) {
                     if (binding.operatorSpinner.selectedItemPosition != 0) {
-                        searchViewModel.onSearch(binding.operatorSpinner.selectedItemPosition, isAdmin)
+                        searchViewModel.onSearch(
+                            binding.operatorSpinner.selectedItemPosition,
+                            isAdmin
+                        )
                     } else {
-                        Toast.makeText(requireContext(), "Datos faltante", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Datos faltante", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 } else {
-                        searchViewModel.onSearch()
+                    searchViewModel.onSearch()
                 }
+            }
+            binding.mapList.id -> {
+                val locations = Locations(list = liftingAdapter.getCurrentItems(), singleLocation = false)
+                launchDirection(
+                    SearchFragmentDirections.actionSearchFragmentToMapsFragment(locations)
+                )
             }
         }
     }

@@ -45,11 +45,11 @@
         android:label="@string/location"
         tools:layout="@layout/fragment_maps" >
         <argument
-            android:name="liftingInfo"
-            app:argType="com.mezda.aciud.data.models.LiftingInfo" />
+            android:name="locations"
+            app:argType="com.mezda.aciud.data.models.Locations" />
     </fragment>
     <navigation android:id="@+id/liftingGraph"
-        app:startDestination="@id/partyInfoFragment">
+        app:startDestination="@id/userInfoFragment">
         <fragment
             android:id="@+id/userInfoFragment"
             android:name="com.mezda.aciud.ui.lifting_flow.user_info.UserInfoFragment"

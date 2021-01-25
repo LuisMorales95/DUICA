@@ -42,8 +42,14 @@ class GPSTracker(var mContext: Context) : Service(), LocationListener {
     fun location(): Location? {
         try {
             if (
-                ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                ActivityCompat.checkSelfPermission(
+                    mContext,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(
+                    mContext,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
             ) {
                 return null
             }
@@ -58,9 +64,9 @@ class GPSTracker(var mContext: Context) : Service(), LocationListener {
                 if (isNetworkEnabled) {
 
                     locationManager!!.requestLocationUpdates(
-                            LocationManager.NETWORK_PROVIDER,
-                            MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this
+                        LocationManager.NETWORK_PROVIDER,
+                        MIN_TIME_BW_UPDATES,
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this
                     )
                     Log.d("Network", "Network")
                     if (locationManager != null) {
@@ -76,9 +82,9 @@ class GPSTracker(var mContext: Context) : Service(), LocationListener {
                 if (isGPSEnabled) {
                     if (location == null) {
                         locationManager!!.requestLocationUpdates(
-                                LocationManager.GPS_PROVIDER,
-                                MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this
+                            LocationManager.GPS_PROVIDER,
+                            MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this
                         )
                         Log.d("GPS Enabled", "GPS Enabled")
                         if (locationManager != null) {
@@ -120,11 +126,11 @@ class GPSTracker(var mContext: Context) : Service(), LocationListener {
         alertDialog.setTitle("GPS is settings")
         alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?")
         alertDialog.setPositiveButton("Settings",
-                DialogInterface.OnClickListener { dialog, which ->
-                    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    mContext.startActivity(intent)
-                })
-        alertDialog.setNegativeButton("Cancel", { dialog, which -> dialog.cancel() })
+            DialogInterface.OnClickListener { _, _ ->
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                mContext.startActivity(intent)
+            })
+        alertDialog.setNegativeButton("Cancel", { dialog, _ -> dialog.cancel() })
         alertDialog.show()
     }
 

@@ -29,6 +29,17 @@ class MapsFragment : Fragment() {
     val args: MapsFragmentArgs by navArgs()
 
     private val callback = OnMapReadyCallback { googleMap ->
+        try {
+            val success = googleMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(),
+                    R.raw.style_json
+                )
+            )
+            if (!success) Timber.e("Style parsing failed.")
+        } catch (e: NotFoundException) {
+            Timber.e("Can't find style. Error: $e")
+        }
         /**
          * Manipulates the map once available.
          * This callback is triggered when the map is ready to be used.
@@ -38,43 +49,38 @@ class MapsFragment : Fragment() {
          * install it inside the SupportMapFragment. This method will only be triggered once the
          * user has installed Google Play services and returned to the app.
          */
-        val liftingInfo = args.liftingInfo
-        if ((liftingInfo.image ?: "").isNotEmpty()) {
-            binding.pictureImageView.visibility = View.VISIBLE
-            Glide.with(requireActivity()).load(RetrofitModule.baseUrl + liftingInfo.image?.replace("~/", "")).into(binding.pictureImageView)
-        }
-        val place = LatLng(
+        val sLocation = args.locations.singleLocation
+        if (sLocation) {
+            val liftingInfo = args.locations.list[0]
+            if ((liftingInfo.image ?: "").isNotEmpty()) {
+                binding.pictureImageView.visibility = View.VISIBLE
+                Glide.with(requireActivity()).load(RetrofitModule.baseUrl + liftingInfo.image?.replace("~/", "")).into(binding.pictureImageView)
+            }
+            val place = LatLng(
                 (liftingInfo.latitude ?: "0.0").toDouble(),
                 (liftingInfo.longitude ?: "0.0").toDouble()
-        )
-        // Add a marker in Sydney and move the camera
-        try {
-            val success = googleMap.setMapStyle(
-                    MapStyleOptions.loadRawResourceStyle(
-                            requireContext(),
-                            R.raw.style_json
-                    )
             )
-            if (!success) Timber.e("Style parsing failed.")
-        } catch (e: NotFoundException) {
-            Timber.e("Can't find style. Error: $e")
-        }
-        googleMap.addMarker(MarkerOptions().position(place).title(
+            googleMap.addMarker(MarkerOptions().position(place).title(
                 "${liftingInfo.name} ${liftingInfo.paternal_surname} ${liftingInfo.maternal_surname}\n ${liftingInfo.number} ${liftingInfo.street}"
-        ))
-        val camera = CameraPosition.Builder().target(place).zoom(15f).bearing(0f).tilt(30f).build()
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
+            ))
+            val camera = CameraPosition.Builder().target(place).zoom(15f).bearing(0f).tilt(30f).build()
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
+        } else {
+            val liftingList = args.locations.list
+            liftingList.forEach {
+                val place = LatLng(
+                    (it.latitude ?: "0.0").toDouble(),
+                    (it.longitude ?: "0.0").toDouble()
+                )
+                googleMap.addMarker(MarkerOptions().position(place).title(
+                    "${it.name} ${it.paternal_surname} ${it.maternal_surname}\n ${it.number} ${it.street}"
+                ))
+                val camera = CameraPosition.Builder().target(place).zoom(15f).bearing(0f).tilt(30f).build()
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
+            }
+        }
 
-        /*googleMap.addMarker(
-                MarkerOptions().position(place)
-                        .title("${liftingInfo.name} ${liftingInfo.paternal_surname} ${liftingInfo.maternal_surname}\n ${liftingInfo.number} ${liftingInfo.street}")
-        )
-        val cameraPosition = CameraPosition.Builder().target(Place_LngLat).zoom(15f).bearing(0f).tilt(30f).build()
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
 
-        val zoom = CameraUpdateFactory.zoomTo(15f)
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(place))
-        googleMap.animateCamera(zoom)*/
     }
 
     override fun onCreateView(

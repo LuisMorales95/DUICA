@@ -190,7 +190,6 @@ class LiftingViewModel @ViewModelInject constructor(
             phone: String,
             street: String,
             street_number: String,
-            locality: Int,
             suburb: String,
             latitude: String,
             longitude: String,

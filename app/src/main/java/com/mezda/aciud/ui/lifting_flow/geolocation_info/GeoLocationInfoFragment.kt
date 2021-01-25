@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.mezda.aciud.ui.lifting_flow.geolocation_info
 
 import android.Manifest
@@ -87,7 +89,7 @@ class GeoLocationInfoFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-    fun validateRequiredLocation(): Boolean{
+    private fun validateRequiredLocation(): Boolean{
         return longitude != 0.0 || latitude != 0.0
     }
 }

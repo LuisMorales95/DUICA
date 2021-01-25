@@ -1,5 +1,6 @@
 package com.mezda.aciud.ui.lifting_flow.user_info
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
@@ -20,7 +21,6 @@ import com.bumptech.glide.Glide
 import com.mezda.aciud.R
 import com.mezda.aciud.databinding.FragmentUserInfoBinding
 import com.mezda.aciud.ui.BaseFragment
-import com.mezda.aciud.ui.MainActivity
 import com.mezda.aciud.ui.lifting_flow.LiftingFlowViewModel
 import com.mezda.aciud.ui.lifting_flow.LiftingFlowViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,9 +42,11 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
     private val viewModel by navGraphViewModels<LiftingFlowViewModel>(R.id.liftingGraph) {
         factory
     }
+    companion object {
+        const val CAPTURE = 1
+    }
 
-    private var REQUEST_IMAGE_CAPTURE = 1
-    lateinit var currentPhotoPath: String
+    private lateinit var currentPhotoPath: String
     private var photoFile: File? = null
     private var photoUri: Uri? = null
     private var photoBitmap: Bitmap? = null
@@ -54,7 +56,7 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_user_info, container, false)
 
         Glide.with(requireContext()).load(R.drawable.profile_picture)
@@ -118,6 +120,7 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
+    @SuppressLint("QueryPermissionsNeeded")
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
@@ -135,11 +138,11 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
                 photoFile?.also {
                     photoUri = FileProvider.getUriForFile(
                         requireContext(),
-                        "com.example.android.fileprovider",
+                        getString(R.string.file_provider_package),
                         it
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+                    startActivityForResult(takePictureIntent, CAPTURE)
                 }
             }
         }
@@ -147,7 +150,7 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == CAPTURE && resultCode == Activity.RESULT_OK) {
             photoBitmap = BitmapFactory.decodeFile(photoFile?.absolutePath)
 //            photoBitmap = data?.extras?.get("data") as Bitmap
             val byteArrayOutputStream = ByteArrayOutputStream()
@@ -164,7 +167,7 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val timeStamp: String = SimpleDateFormat(this.getString(R.string.date_hour_format), Locale.getDefault()).format(Date())
         val storageDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
             "JPEG_${timeStamp}_", /* prefix */

@@ -18,11 +18,12 @@ class LiftingFlowViewModel @ViewModelInject constructor(
 ) : BaseViewModel() {
 
     var userInfo: UserInfo = UserInfo(
-        "L","L","L","9"
+        "L", "L", "L", "9"
     )
     var directionInfo = DirectionInfo()
     var geolocationinfo = GeoLocationInfo()
     var occupationInfo = OccupationInfo()
+    var partyInfo = PartyInfo()
 
 
     /**UserInfo*/
@@ -34,14 +35,21 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         picture_encoded: String?,
         picture_uri: String?
     ) {
-        userInfo = UserInfo(name, paternal_last_name, maternal_last_name, phone_number,picture_encoded = picture_encoded, picture_uri = picture_uri)
+        userInfo = UserInfo(
+            name,
+            paternal_last_name,
+            maternal_last_name,
+            phone_number,
+            picture_encoded = picture_encoded,
+            picture_uri = picture_uri
+        )
         Timber.e("saveInfo: ${Gson().toJson(userInfo)}")
     }
 
 
     /**DirectionsInfo*/
     private val _section = MutableLiveData<List<Section>>()
-    val section = Transformations.map(_section){
+    val section = Transformations.map(_section) {
         val list = mutableListOf<String>()
         list.add("Selecciona una seccion")
         it.forEach {
@@ -50,11 +58,11 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         list
     }
 
-    fun getSection():String {
+    fun getSection(): String {
         var sectionName = ""
-        run loop@ {
+        run loop@{
             _section.value?.forEach {
-                if (directionInfo.section == it.idSection){
+                if (directionInfo.section == it.idSection) {
                     sectionName = it.section
                     return@loop
                 }
@@ -74,11 +82,11 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         list
     }
 
-    fun getSuburb():String {
+    fun getSuburb(): String {
         var suburbName = ""
-        run loop@ {
+        run loop@{
             _suburb.value?.forEach {
-                if (directionInfo.suburb == it.idSuburb){
+                if (directionInfo.suburb == it.idSuburb) {
                     suburbName = it.nameSuburb ?: ""
                     return@loop
                 }
@@ -114,12 +122,12 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         street: String,
         street_number: String,
         section: String,
-        suburb:String
+        suburb: String
     ) {
         var sectionId = 0
-        run loop@ {
+        run loop@{
             _section.value?.forEachIndexed { index, s ->
-                if (s.section == section){
+                if (s.section == section) {
                     sectionId = index
                     return@loop
                 }
@@ -127,9 +135,9 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         }
 
         var suburbId = 0
-        run loop@ {
-            _suburb.value?.forEachIndexed { index, suburbs ->
-                if (suburbs.nameSuburb == suburb){
+        run loop@{
+            _suburb.value?.forEachIndexed { _, suburbs ->
+                if (suburbs.nameSuburb == suburb) {
                     suburbId = suburbs.idSuburb ?: 0
                     return@loop
                 }
@@ -147,7 +155,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
 
     /**GeoLocationInfo*/
 
-    fun saveGeoLocation(latitude: Double, longitude:  Double){
+    fun saveGeoLocation(latitude: Double, longitude: Double) {
         geolocationinfo.apply {
             this.latitude = latitude
             this.longitude = longitude
@@ -157,7 +165,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
     /**OccupationInfo*/
 
     private val _profession = MutableLiveData<List<Profession>>()
-    val profession = Transformations.map(_profession){
+    val profession = Transformations.map(_profession) {
         val list = mutableListOf<String>()
         list.add("Selecciona una profession")
         it.forEach { professions ->
@@ -167,7 +175,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
     }
 
     private val _supportType = MutableLiveData<List<SupportTypes>>()
-    val supportType = Transformations.map(_supportType){
+    val supportType = Transformations.map(_supportType) {
         val list = mutableListOf<String>()
         list.add("Selecciona un Tipo de apoyo")
         it.forEach { support ->
@@ -181,6 +189,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
             _profession.postValue(liftingRepositoryImpl.getProfession())
         }
     }
+
     fun onGetSupportType() {
         ioThread.launch {
             _supportType.postValue(liftingRepositoryImpl.getSupportType())
@@ -189,10 +198,10 @@ class LiftingFlowViewModel @ViewModelInject constructor(
 
     fun getProfessionIndex(): Int {
         var professionIndex = 0
-        if (occupationInfo.profession != 0){
-            run loop@ {
+        if (occupationInfo.profession != 0) {
+            run loop@{
                 _profession.value?.forEachIndexed { index, profession ->
-                    if (occupationInfo.profession == profession.id ){
+                    if (occupationInfo.profession == profession.id) {
                         professionIndex = index + 1
                         return@loop
                     }
@@ -205,10 +214,10 @@ class LiftingFlowViewModel @ViewModelInject constructor(
 
     fun getSupportTypeIndex(): Int {
         var supportTypeIndex = 0
-        if (occupationInfo.supportTypes != 0){
-            run loop@ {
+        if (occupationInfo.supportTypes != 0) {
+            run loop@{
                 _supportType.value?.forEachIndexed { index, supportTypes ->
-                    if (occupationInfo.supportTypes == supportTypes.id){
+                    if (occupationInfo.supportTypes == supportTypes.id) {
                         supportTypeIndex = index + 1
                         return@loop
                     }
@@ -220,9 +229,9 @@ class LiftingFlowViewModel @ViewModelInject constructor(
     }
 
     fun saveOccupationInfo(
-            profession_position: Int,
-            supportType_position: Int,
-            observations: String
+        profession_position: Int,
+        supportType_position: Int,
+        observations: String
     ) {
         occupationInfo.apply {
             this.profession = _profession.value?.get(profession_position - 1)?.id ?: 0
@@ -234,7 +243,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
     /**PartyInfo*/
 
     private val _flag = MutableLiveData<List<Flag>>()
-    val flag = Transformations.map(_flag){
+    val flag = Transformations.map(_flag) {
         val list = mutableListOf<String>()
         list.add("Selecciona una Bandera")
         it.forEach { professions ->
@@ -243,10 +252,27 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         list
     }
 
-
     fun getFlags() {
         ioThread.launch {
             _flag.postValue(liftingRepositoryImpl.getFlags())
+        }
+    }
+
+    fun savePartyInfo(statusId: Int, flagPosition: Int) {
+        ioThread.launch {
+            var mFlag: Int? = null
+            if (flagPosition != 0) {
+                _flag.value?.forEachIndexed { index, flag ->
+                    if (index == flagPosition.minus(1)) {
+                        mFlag = flag.id
+                    }
+                }
+            }
+            partyInfo.apply {
+                status_4t = statusId
+                flag = mFlag
+            }
+            Timber.e(Gson().toJson(partyInfo))
         }
     }
 }
