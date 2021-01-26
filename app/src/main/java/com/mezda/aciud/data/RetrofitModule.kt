@@ -24,6 +24,7 @@ class RetrofitModule {
 
     companion object {
         const val baseUrl = "http://prep.cccmexctz.com.mx/"
+        const val testingUrl = "http://prepr1.cccmexctz.com.mx/"
     }
 
     @Provides
@@ -46,7 +47,7 @@ class RetrofitModule {
     @ActivityScoped
     fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-                .baseUrl(baseUrl)
+                .baseUrl(testingUrl)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()

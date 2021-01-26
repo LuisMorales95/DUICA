@@ -1,40 +1,43 @@
 package com.mezda.aciud.ui.map
 
+import android.annotation.SuppressLint
 import android.content.res.Resources.NotFoundException
-import android.net.Uri
+import android.graphics.*
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.mezda.aciud.R
 import com.mezda.aciud.data.RetrofitModule
+import com.mezda.aciud.data.models.LiftingInfo
 import com.mezda.aciud.databinding.FragmentMapsBinding
 import timber.log.Timber
 
-class MapsFragment : Fragment() {
+
+@Suppress("DEPRECATION")
+class MapsFragment : Fragment(), View.OnClickListener {
 
     lateinit var binding: FragmentMapsBinding
     val args: MapsFragmentArgs by navArgs()
 
+    @Suppress("DEPRECATION")
     private val callback = OnMapReadyCallback { googleMap ->
         try {
             val success = googleMap.setMapStyle(
-                MapStyleOptions.loadRawResourceStyle(
-                    requireContext(),
-                    R.raw.style_json
-                )
+                MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.style_json)
             )
             if (!success) Timber.e("Style parsing failed.")
         } catch (e: NotFoundException) {
@@ -52,43 +55,46 @@ class MapsFragment : Fragment() {
         val sLocation = args.locations.singleLocation
         if (sLocation) {
             val liftingInfo = args.locations.list[0]
-            if ((liftingInfo.image ?: "").isNotEmpty()) {
-                binding.pictureImageView.visibility = View.VISIBLE
-                Glide.with(requireActivity()).load(RetrofitModule.baseUrl + liftingInfo.image?.replace("~/", "")).into(binding.pictureImageView)
-            }
             val place = LatLng(
                 (liftingInfo.latitude ?: "0.0").toDouble(),
                 (liftingInfo.longitude ?: "0.0").toDouble()
             )
-            googleMap.addMarker(MarkerOptions().position(place).title(
-                "${liftingInfo.name} ${liftingInfo.paternal_surname} ${liftingInfo.maternal_surname}\n ${liftingInfo.number} ${liftingInfo.street}"
-            ))
-            val camera = CameraPosition.Builder().target(place).zoom(15f).bearing(0f).tilt(30f).build()
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
+            val fullName = "${liftingInfo.name} ${liftingInfo.paternal_surname}"
+            val phone = "${liftingInfo.phone}"
+            createMarker(liftingInfo, googleMap, place, fullName, phone)
         } else {
             val liftingList = args.locations.list
             liftingList.forEach {
-                val place = LatLng(
-                    (it.latitude ?: "0.0").toDouble(),
-                    (it.longitude ?: "0.0").toDouble()
-                )
-                googleMap.addMarker(MarkerOptions().position(place).title(
-                    "${it.name} ${it.paternal_surname} ${it.maternal_surname}\n ${it.number} ${it.street}"
-                ))
-                val camera = CameraPosition.Builder().target(place).zoom(15f).bearing(0f).tilt(30f).build()
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
+                val place =
+                    LatLng((it.latitude ?: "0.0").toDouble(), (it.longitude ?: "0.0").toDouble())
+                val full_name = "${it.name} ${it.paternal_surname}"
+                val phone = "${it.phone}"
+                createMarker(it, googleMap, place, full_name, phone)
             }
         }
 
+        googleMap.setOnMarkerClickListener { marker ->
+            run loop@ {
+                args.locations.list.forEach { liftingInfo ->
+                    if ((marker.tag as Int) == liftingInfo.idLifting) {
+                        binding.pictureImageView.visibility = View.VISIBLE
+                        Glide.with(requireContext()).load(buildImageUrlString(liftingInfo)).into(binding.pictureImageView)
+                        return@loop
+                    }
+                }
+            }
 
+            false
+        }
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_maps, container, false)
+        binding.pictureImageView.setOnClickListener(this)
         return binding.root
     }
 
@@ -96,5 +102,128 @@ class MapsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
+    }
+
+    override fun onClick(p0: View?) {
+        when (p0?.id) {
+            binding.pictureImageView.id -> {
+                binding.pictureImageView.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun createMarker(
+        liftingInfo: LiftingInfo,
+        googleMap: GoogleMap,
+        place: LatLng,
+        full_name: String,
+        phone: String
+    ) {
+        if (imagePathExists(liftingInfo)) {
+            downloadMarkerImage(liftingInfo, googleMap, place, full_name, phone)
+        } else {
+            setUpMarker(googleMap, null, place, full_name, phone, liftingInfo.idLifting ?: 0)
+        }
+    }
+
+    private fun downloadMarkerImage(
+        liftingInfo: LiftingInfo,
+        googleMap: GoogleMap,
+        place: LatLng,
+        full_name: String,
+        phone: String
+    ) {
+        Glide.with(requireContext()).asBitmap().load(buildImageUrlString(liftingInfo)).circleCrop()
+            .into(object :
+                SimpleTarget<Bitmap>() {
+                override fun onResourceReady(
+                    resource: Bitmap,
+                    transition: Transition<in Bitmap>?
+                ) {
+                    setUpMarker(
+                        googleMap,
+                        resource,
+                        place,
+                        full_name,
+                        phone,
+                        liftingInfo.idLifting ?: 0
+                    )
+                }
+            })
+    }
+
+    private fun buildImageUrlString(it: LiftingInfo) =
+        RetrofitModule.baseUrl + it.image?.replace("~/", "")
+
+    private fun imagePathExists(it: LiftingInfo) = it.image != null
+
+    fun setUpMarker(
+        googleMap: GoogleMap,
+        clientImage: Bitmap?,
+        place: LatLng,
+        fullName: String,
+        phone: String,
+        tag: Int
+    ) {
+        val marker = googleMap.addMarker(
+            MarkerOptions()
+                .position(place)
+                .icon(
+                    BitmapDescriptorFactory.fromBitmap(
+                        getMarkerBitmapFromView(
+                            clientImage,
+                            fullName,
+                            phone
+                        )
+                    )
+                )
+        )
+        if (clientImage != null) marker.tag = tag
+        val camera = CameraPosition.Builder().target(place).zoom(13f).bearing(0f).tilt(30f).build()
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
+    }
+
+
+    @SuppressLint("InflateParams")
+    private fun getMarkerBitmapFromView(
+        client: Bitmap?,
+        name: String,
+        phone: String
+    ): Bitmap? {
+
+        val customMarkerView = LayoutInflater.from(requireContext()).inflate(
+            R.layout.custom_map_pointer,
+            null
+        )
+
+        val markerImage: ImageView = customMarkerView.findViewById(R.id.marker_image)
+        markerImage.setImageResource(R.drawable.ic_map)
+        val clientImageView: ImageView = customMarkerView.findViewById<ImageView>(R.id.client_image)
+        if (client != null) {
+            clientImageView.visibility = View.VISIBLE
+            clientImageView.setImageBitmap(client)
+        } else clientImageView.visibility = View.GONE
+        customMarkerView.findViewById<TextView>(R.id.text_title).apply { text = name }
+        customMarkerView.findViewById<TextView>(R.id.text_subtitle).apply { text = phone }
+
+        customMarkerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        customMarkerView.layout(
+            0,
+            0,
+            customMarkerView.measuredWidth,
+            customMarkerView.measuredHeight
+        )
+        customMarkerView.buildDrawingCache()
+        val returnedBitmap = Bitmap.createBitmap(
+            customMarkerView.measuredWidth,
+            customMarkerView.measuredHeight,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(returnedBitmap)
+        canvas.drawColor(Color.WHITE, PorterDuff.Mode.SRC_IN)
+        val drawable = customMarkerView.background
+        drawable?.draw(canvas)
+        customMarkerView.draw(canvas)
+        return returnedBitmap
     }
 }

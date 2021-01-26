@@ -59,15 +59,14 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_user_info, container, false)
 
-        Glide.with(requireContext()).load(R.drawable.profile_picture)
-            .into(binding.profilePictureImage)
+        Glide.with(requireContext()).load(R.drawable.profile_picture).circleCrop().into(binding.profilePictureImage)
 
         photoEncoded = viewModel.userInfo.picture_encoded
         viewModel.userInfo.picture_uri?.let {
             if (it != "null") {
                 Timber.e(it)
                 photoUri = Uri.parse(viewModel.userInfo.picture_uri)
-                Glide.with(requireContext()).load(Uri.parse(it)).into(binding.profilePictureImage)
+                Glide.with(requireContext()).load(Uri.parse(it)).circleCrop().into(binding.profilePictureImage)
             }
         }
         binding.userNameText.editText?.setText(viewModel.userInfo.name)
@@ -159,7 +158,7 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
                 photoEncoded =
                     Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT)
             }
-            Glide.with(requireContext()).load(photoUri).into(binding.profilePictureImage)
+            Glide.with(requireContext()).load(photoUri).circleCrop().into(binding.profilePictureImage)
         }
 
     }

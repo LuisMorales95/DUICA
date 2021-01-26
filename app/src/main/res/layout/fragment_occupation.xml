@@ -54,6 +54,49 @@
                     android:layout_marginTop="@dimen/medium_margin"
                     tools:listitem="@android:layout/simple_dropdown_item_1line" />
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/medium_margin"
+                    android:text="Simpatizante 4T"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <RadioGroup
+                    android:id="@+id/options_radio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/no_radio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="No"/>
+
+                    <RadioButton
+                        android:id="@+id/yes_radio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Si" />
+
+                    <RadioButton
+                        android:id="@+id/fan_radio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Fan Destacado" />
+                </RadioGroup>
+
+                <Spinner
+                    android:id="@+id/flag_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/medium_margin"
+                    tools:listitem="@android:layout/simple_dropdown_item_1line" />
+
                 <EditText
                     android:id="@+id/observations_text_area"
                     android:layout_width="match_parent"

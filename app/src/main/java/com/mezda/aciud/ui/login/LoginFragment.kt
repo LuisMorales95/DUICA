@@ -36,7 +36,6 @@ class LoginFragment : BaseFragment() {
             launchDirection(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
         }
 
-        binding.userTextInputLayout.editText?.setText("Admin")
 
         binding.startButton.setOnClickListener {
             val user = binding.userTextInputLayout.editText?.text?.toString() ?: ""
@@ -73,6 +72,7 @@ class LoginFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         Glide.with(requireView()).load(R.drawable.aciud).into(binding.logoImage)
         Glide.with(requireView()).load(R.drawable.morena_logo).into(binding.imageView)
+        binding.userTextInputLayout.editText?.setText("Admin")
     }
 
     companion object {
@@ -99,26 +99,11 @@ class LoginFragment : BaseFragment() {
     }
 
     private fun hasPhonePermission() =
-        ContextCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.CAMERA
-                ) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
+        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
 
     override fun onRequestPermissionsResult(
         requestCode: Int,

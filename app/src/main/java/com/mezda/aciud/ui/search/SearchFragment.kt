@@ -56,6 +56,7 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
             LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         binding.liftingRecycler.setHasFixedSize(true)
         binding.localityTextView.text = Locality.getDefault().nameLocality
+        //binding.localityTextView.visibility = View.GONE
 
         searchViewModel.operator.observe(viewLifecycleOwner, {
             (requireActivity() as MainActivity).supportActionBar?.title = it.name

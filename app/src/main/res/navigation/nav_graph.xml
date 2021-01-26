@@ -83,14 +83,14 @@
             android:label="Levantamiento Paso 4"
             tools:layout="@layout/fragment_occupation">
             <action
-                android:id="@+id/action_occupationInfoFragment_to_partyInfoFragment"
-                app:destination="@id/partyInfoFragment" />
+                android:id="@+id/action_occupationInfoFragment_to_previewInfoFragment"
+                app:destination="@id/previewInfoFragment" />
         </fragment>
         <fragment
-            android:id="@+id/partyInfoFragment"
-            android:name="com.mezda.aciud.ui.lifting_flow.party_info.PartyInfoFragment"
-            android:label="PartyInfoFragment"
-            tools:layout="@layout/fragment_party">
+            android:id="@+id/previewInfoFragment"
+            android:name="com.mezda.aciud.ui.lifting_flow.preview_info.PreviewInfoFragment"
+            android:label="Datos Recolectados"
+            tools:layout="@layout/fragment_preview_info">
             <action
                 android:id="@+id/action_partyInfoFragment_to_searchFragment"
                 app:destination="@id/searchFragment"

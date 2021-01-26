@@ -26,14 +26,18 @@ class OccupationInfoFragment : BaseFragment(), View.OnClickListener {
 
     lateinit var binding: FragmentOccupationBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_occupation, container, false)
 
         viewModel.profession.observe(viewLifecycleOwner) {
             binding.professionSpinner.adapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_list_item_1,
-                    it.toTypedArray()
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                it.toTypedArray()
             )
             val professionPosition = viewModel.getProfessionIndex()
             if (professionPosition != 0) binding.professionSpinner.setSelection(professionPosition)
@@ -41,19 +45,33 @@ class OccupationInfoFragment : BaseFragment(), View.OnClickListener {
 
         viewModel.supportType.observe(viewLifecycleOwner) {
             binding.supportTypeSpinner.adapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_list_item_1,
-                    it.toTypedArray()
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                it.toTypedArray()
             )
             val supportTypePosition = viewModel.getSupportTypeIndex()
-            if (supportTypePosition != 0) binding.supportTypeSpinner.setSelection(supportTypePosition)
+            if (supportTypePosition != 0) binding.supportTypeSpinner.setSelection(
+                supportTypePosition
+            )
         }
 
+        viewModel.flag.observe(viewLifecycleOwner, {
+            binding.flagSpinner.adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                it.toTypedArray()
+            )
+            val flagPosition = viewModel.getFlagIndex()
+            if (flagPosition != 0) binding.flagSpinner.setSelection(flagPosition)
+        })
+
+
+        viewModel.getFlags()
         viewModel.onGetProfessions()
         viewModel.onGetSupportType()
-
+        binding.observationsTextArea.setText(viewModel.getObservations())
+        setSelectedRadio(viewModel.getStatus4T())
         binding.nextButton.setOnClickListener(this)
-
         return binding.root
     }
 
@@ -62,11 +80,13 @@ class OccupationInfoFragment : BaseFragment(), View.OnClickListener {
             binding.nextButton.id -> {
                 if (validateRequiredInfo()) {
                     viewModel.saveOccupationInfo(
-                            binding.professionSpinner.selectedItemPosition,
-                            binding.supportTypeSpinner.selectedItemPosition,
-                            binding.observationsTextArea.text.toString()
+                        binding.professionSpinner.selectedItemPosition,
+                        binding.supportTypeSpinner.selectedItemPosition,
+                        getSympathizerOptionValue(),
+                        binding.flagSpinner.selectedItemPosition,
+                        binding.observationsTextArea.text.toString()
                     )
-                    launchDirection(OccupationInfoFragmentDirections.actionOccupationInfoFragmentToPartyInfoFragment())
+                    launchDirection(OccupationInfoFragmentDirections.actionOccupationInfoFragmentToPreviewInfoFragment())
                 } else {
                     toast("Información Requerida")
                 }
@@ -85,7 +105,33 @@ class OccupationInfoFragment : BaseFragment(), View.OnClickListener {
                 toast("Tipo de Apoyo faltante")
                 false
             }
+            binding.optionsRadio.checkedRadioButtonId == -1 -> {
+                toast("Estatus requerido")
+                false
+            }
+            binding.flagSpinner.selectedItemPosition == 0 -> {
+                toast("Bandera Requerida")
+                false
+            }
             else -> true
+        }
+    }
+
+
+    private fun setSelectedRadio(status4T: Int) {
+        when (status4T) {
+            1 -> binding.noRadio.isChecked = true
+            2 ->binding.yesRadio.isChecked = true
+            3 ->binding.fanRadio.isChecked = true
+            else ->binding.noRadio.isChecked = true
+        }
+    }
+    private fun getSympathizerOptionValue(): Int {
+        return when (binding.optionsRadio.checkedRadioButtonId) {
+            binding.noRadio.id -> 1
+            binding.yesRadio.id -> 2
+            binding.fanRadio.id -> 3
+            else -> 1
         }
     }
 }

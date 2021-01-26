@@ -36,9 +36,9 @@ class AddressInfoFragment: BaseFragment(), View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_address_info, container, false)
 
-        binding.localityTextView.text = Locality.getDefault().nameLocality
         binding.streetText.editText?.setText(viewModel.directionInfo.street)
         binding.streetNumberText.editText?.setText(viewModel.directionInfo.street_number.toString())
+        binding.localityTextView.text = Locality.getDefault().nameLocality
         binding.localitySpinner.visibility = View.GONE
 
         viewModel.section.observe(viewLifecycleOwner) {
