@@ -38,6 +38,7 @@ class LiftingAdapter(private val liftingListener: LiftingListener) : RecyclerVie
 
         @SuppressLint("SetTextI18n")
         fun bind(liftingInfo: LiftingInfo, liftingListener: LiftingListener) {
+            binding.textView4.text = "${liftingInfo.idLifting}"
             binding.textView2.text = "${liftingInfo.name} ${liftingInfo.paternal_surname} ${liftingInfo.maternal_surname}"
             binding.textView3.text = "${liftingInfo.number} ${liftingInfo.street}"
             binding.imageMap.setOnClickListener {

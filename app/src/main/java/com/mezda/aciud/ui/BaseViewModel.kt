@@ -29,6 +29,4 @@ abstract class BaseViewModel : ViewModel() {
         super.onCleared()
         job.cancel()
     }
-
-
 }

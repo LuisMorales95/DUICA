@@ -22,6 +22,8 @@ class LiftingFlowViewModel @ViewModelInject constructor(
     private val liftingRepositoryImpl: LiftingRepositoryImpl
 ) : BaseViewModel() {
 
+    private var liftingInfo: LiftingInfo? = null
+
     private val _loading = MutableLiveData<Boolean>()
     val loading: LiveData<Boolean>
         get() = _loading
@@ -37,7 +39,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
     /**UserInfo*/
 
     var userInfo: UserInfo = UserInfo(
-        "Luis", "Morales", "Perez", "9212222222"
+//        "Luis", "Morales", "Perez", "9212222222"
     )
 
     fun saveUserInfo(
@@ -63,7 +65,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
     /**DirectionsInfo*/
 
     var directionInfo = DirectionInfo(
-        "Araucaria", 10, "COATZACOALCOS", 1, "4723", 215, "20 DE NOVIEMBRE               ", 2
+//        "Araucaria", 10, "COATZACOALCOS", 1, "4723", 215, "20 DE NOVIEMBRE               ", 2
     )
 
     private val _section = MutableLiveData<List<Section>>()
@@ -177,7 +179,9 @@ class LiftingFlowViewModel @ViewModelInject constructor(
 
     /**GeoLocationInfo*/
 
-    var geolocationinfo = GeoLocationInfo(37.4219983, -122.084)
+    var geolocationinfo = GeoLocationInfo(
+//        37.4219983, -122.084
+    )
 
     fun getGetLocation() = geolocationinfo
 
@@ -192,10 +196,10 @@ class LiftingFlowViewModel @ViewModelInject constructor(
     /**OccupationInfo*/
 
     var occupationInfo = OccupationInfo(
-        3, "Fotógrafo", 10, "Apoyo microempresas", "testing occupation"
+//        3, "Fotógrafo", 10, "Apoyo microempresas", "testing occupation"
     )
     var partyInfo = PartyInfo(
-        2, 4, "Problemático "
+//        2, 4, "Problemático "
     )
 
     private val _profession = MutableLiveData<List<Profession>>()
@@ -305,14 +309,6 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         observations: String
     ) {
         ioThread.launch {
-            var mFlag: Int? = null
-            if (flagPosition != 0) {
-                _flag.value?.forEachIndexed { index, flag ->
-                    if (index == flagPosition.minus(1)) {
-                        mFlag = flag.id
-                    }
-                }
-            }
             partyInfo.apply {
                 status_4t = statusId
                 flagId = _flag.value?.get(flagPosition - 1)?.id ?: 0
@@ -337,35 +333,37 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         ioThread.launch {
             _loading.postValue(true)
             try {
-                val liftingInfo = LiftingInfo()
-                liftingInfo.name = userInfo.name
-                liftingInfo.paternal_surname = userInfo.paternal_last_name
-                liftingInfo.maternal_surname = userInfo.maternal_last_name
-                liftingInfo.phone = userInfo.phone_number
-                liftingInfo.image = userInfo.picture_encoded ?: "null"
+                liftingInfo = liftingInfo ?: LiftingInfo()
+                liftingInfo?.name = userInfo.name
+                liftingInfo?.paternal_surname = userInfo.paternal_last_name
+                liftingInfo?.maternal_surname = userInfo.maternal_last_name
+                liftingInfo?.phone = userInfo.phone_number
+                liftingInfo?.image = userInfo.picture_encoded ?: "null"
 
-                liftingInfo.street = directionInfo.street
-                liftingInfo.number = directionInfo.street_number.toString()
-                liftingInfo.section = directionInfo.section
-                liftingInfo.sectionId = directionInfo.sectionId
+                liftingInfo?.street = directionInfo.street
+                liftingInfo?.number = directionInfo.street_number.toString()
+                liftingInfo?.section = directionInfo.section
+                liftingInfo?.sectionId = directionInfo.sectionId
 
-                liftingInfo.latitude = geolocationinfo.latitude.toString()
-                liftingInfo.longitude = geolocationinfo.longitude.toString()
+                liftingInfo?.latitude = geolocationinfo.latitude.toString()
+                liftingInfo?.longitude = geolocationinfo.longitude.toString()
 
-                liftingInfo.supportTypeId = occupationInfo.supportTypesId
-                liftingInfo.professionId = occupationInfo.professionId
-                liftingInfo.observations = occupationInfo.observation
-                liftingInfo.sympathizer = partyInfo.status_4t
-                liftingInfo.idFlag = partyInfo.flagId
+                liftingInfo?.supportTypeId = occupationInfo.supportTypesId
+                liftingInfo?.professionId = occupationInfo.professionId
+                liftingInfo?.observations = occupationInfo.observation
+                liftingInfo?.sympathizer = partyInfo.status_4t
+                liftingInfo?.idFlag = partyInfo.flagId
 
                 val dateFormat = SimpleDateFormat(format)
                 val formattedDate = dateFormat.format(Date(System.currentTimeMillis()))
-                liftingInfo.date = formattedDate
-                liftingInfo.idSuburb = directionInfo.suburbId
-                liftingInfo.idOperator = mainRepositoryImpl.liveOperator.value?.operatorId
-                liftingInfo.idSupervisor = mainRepositoryImpl.liveOperator.value?.supervisorId
+                liftingInfo?.date = formattedDate
+                liftingInfo?.idSuburb = directionInfo.suburbId
+                liftingInfo?.idOperator = mainRepositoryImpl.liveOperator.value?.operatorId
+                liftingInfo?.idSupervisor = mainRepositoryImpl.liveOperator.value?.supervisorId
                 Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
-                val response = sendInfo(liftingInfo)
+
+
+                val response = sendInfo(liftingInfo!!)
                 _loading.postValue(false)
                 if (response.isSuccessful) {
                     if ((response.body() ?: 0) > 0) {
@@ -387,5 +385,16 @@ class LiftingFlowViewModel @ViewModelInject constructor(
 
     private suspend fun sendInfo(liftingInfo: LiftingInfo): Response<Int> {
         return liftingRepositoryImpl.sendLifting(liftingInfo)
+    }
+
+    fun mapLiftingToModels(lifting: LiftingInfo) {
+        userInfo = UserInfo(
+            lifting.name ?: "",
+            lifting.paternal_surname ?: "",
+            lifting.maternal_surname ?: "",
+            lifting.phone ?: "",
+            picture_url = lifting.image
+        )
+        TODO("map the rest of the objects")
     }
 }

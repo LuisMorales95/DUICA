@@ -30,6 +30,10 @@ import timber.log.Timber
 @Suppress("DEPRECATION")
 class MapsFragment : Fragment(), View.OnClickListener {
 
+    companion object {
+        const val ZOOM = 14f
+    }
+
     lateinit var binding: FragmentMapsBinding
     val args: MapsFragmentArgs by navArgs()
 
@@ -55,18 +59,14 @@ class MapsFragment : Fragment(), View.OnClickListener {
         val sLocation = args.locations.singleLocation
         if (sLocation) {
             val liftingInfo = args.locations.list[0]
-            val place = LatLng(
-                (liftingInfo.latitude ?: "0.0").toDouble(),
-                (liftingInfo.longitude ?: "0.0").toDouble()
-            )
+            val place = LatLng((liftingInfo.latitude ?: "0.0").toDouble(), (liftingInfo.longitude ?: "0.0").toDouble())
             val fullName = "${liftingInfo.name} ${liftingInfo.paternal_surname}"
             val phone = "${liftingInfo.phone}"
             createMarker(liftingInfo, googleMap, place, fullName, phone)
         } else {
             val liftingList = args.locations.list
             liftingList.forEach {
-                val place =
-                    LatLng((it.latitude ?: "0.0").toDouble(), (it.longitude ?: "0.0").toDouble())
+                val place = LatLng((it.latitude ?: "0.0").toDouble(), (it.longitude ?: "0.0").toDouble())
                 val full_name = "${it.name} ${it.paternal_surname}"
                 val phone = "${it.phone}"
                 createMarker(it, googleMap, place, full_name, phone)
@@ -119,10 +119,13 @@ class MapsFragment : Fragment(), View.OnClickListener {
         full_name: String,
         phone: String
     ) {
-        if (imagePathExists(liftingInfo)) {
-            downloadMarkerImage(liftingInfo, googleMap, place, full_name, phone)
-        } else {
-            setUpMarker(googleMap, null, place, full_name, phone, liftingInfo.idLifting ?: 0)
+        when {
+            imagePathExists(liftingInfo) && liftingInfo.image?.contains("fotolimpia.Jpeg") == false -> {
+                downloadMarkerImage(liftingInfo, googleMap, place, full_name, phone)
+            }
+            else -> {
+                setUpMarker(googleMap, null, place, full_name, phone, liftingInfo.idLifting ?: 0)
+            }
         }
     }
 
@@ -179,7 +182,7 @@ class MapsFragment : Fragment(), View.OnClickListener {
                 )
         )
         if (clientImage != null) marker.tag = tag
-        val camera = CameraPosition.Builder().target(place).zoom(13f).bearing(0f).tilt(30f).build()
+        val camera = CameraPosition.Builder().target(place).zoom(ZOOM).bearing(0f).tilt(30f).build()
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
     }
 

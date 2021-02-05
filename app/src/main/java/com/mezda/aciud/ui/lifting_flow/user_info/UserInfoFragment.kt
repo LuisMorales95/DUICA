@@ -35,15 +35,17 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class UserInfoFragment : BaseFragment(), View.OnClickListener {
 
+    companion object {
+        const val CAPTURE = 1
+    }
+
     private lateinit var binding: FragmentUserInfoBinding
+    private lateinit var args: UserInfoFragmentArgs
 
     @Inject
     lateinit var factory: LiftingFlowViewModelProvider
     private val viewModel by navGraphViewModels<LiftingFlowViewModel>(R.id.liftingGraph) {
         factory
-    }
-    companion object {
-        const val CAPTURE = 1
     }
 
     private lateinit var currentPhotoPath: String
@@ -57,6 +59,9 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        args.lifting?.let { liftingInfo ->
+            viewModel.mapLiftingToModels(liftingInfo)
+        }
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_user_info, container, false)
 
         Glide.with(requireContext()).load(R.drawable.profile_picture).circleCrop().into(binding.profilePictureImage)

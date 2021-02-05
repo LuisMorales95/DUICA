@@ -40,8 +40,8 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
         setHasOptionsMenu(true)
         liftingAdapter = LiftingAdapter(
-            LiftingAdapter.LiftingListener(editListener = { info: LiftingInfo ->
-
+            LiftingAdapter.LiftingListener(editListener = { liftingInfo: LiftingInfo ->
+                launchDirection(SearchFragmentDirections.actionSearchFragmentToUserInfoFragment(liftingInfo))
             }, mapListener = { info: LiftingInfo ->
                 val locations = Locations(mutableListOf(info), singleLocation = true)
                 launchDirection(
@@ -129,7 +129,8 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
                 }
             }
             binding.mapList.id -> {
-                val locations = Locations(list = liftingAdapter.getCurrentItems(), singleLocation = false)
+                val locations =
+                    Locations(list = liftingAdapter.getCurrentItems(), singleLocation = false)
                 launchDirection(
                     SearchFragmentDirections.actionSearchFragmentToMapsFragment(locations)
                 )

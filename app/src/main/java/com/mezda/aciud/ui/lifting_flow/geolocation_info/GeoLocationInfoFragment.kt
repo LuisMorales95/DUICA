@@ -37,6 +37,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class GeoLocationInfoFragment : BaseFragment(), View.OnClickListener {
 
+    companion object {
+        const val ZOOM = 19f
+    }
+
     private lateinit var binding: FragmentGeolocationInfoBinding
     @Inject lateinit var factory: LiftingFlowViewModelProvider
     private val viewModel by navGraphViewModels<LiftingFlowViewModel>(R.id.liftingGraph) { factory }
@@ -80,7 +84,7 @@ class GeoLocationInfoFragment : BaseFragment(), View.OnClickListener {
                 Timber.e("Location longitude ${loc.longitude} latitude ${loc.latitude}")
                 toast("Location longitude ${loc.longitude} latitude ${loc.latitude}")
 
-                val camera = CameraPosition.Builder().target(loc).zoom(15f).bearing(0f).tilt(30f).build()
+                val camera = CameraPosition.Builder().target(loc).zoom(ZOOM).bearing(0f).tilt(30f).build()
                 map.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
 
                 longitude = location.longitude
@@ -97,7 +101,7 @@ class GeoLocationInfoFragment : BaseFragment(), View.OnClickListener {
         if (savedLocation.latitude != 0.0 || savedLocation.longitude != 0.0){
             this.latitude = savedLocation.latitude
             this.longitude = savedLocation.longitude
-            val camera = CameraPosition.Builder().target(LatLng(latitude, longitude)).zoom(15f).bearing(0f).tilt(30f).build()
+            val camera = CameraPosition.Builder().target(LatLng(latitude, longitude)).zoom(ZOOM).bearing(0f).tilt(30f).build()
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
         }
     }
