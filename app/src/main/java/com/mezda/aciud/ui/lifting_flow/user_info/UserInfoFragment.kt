@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.Glide
 import com.mezda.aciud.R
@@ -40,7 +41,7 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
     }
 
     private lateinit var binding: FragmentUserInfoBinding
-    private lateinit var args: UserInfoFragmentArgs
+    private val args: UserInfoFragmentArgs by navArgs()
 
     @Inject
     lateinit var factory: LiftingFlowViewModelProvider

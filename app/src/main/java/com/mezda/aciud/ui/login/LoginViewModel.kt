@@ -29,7 +29,7 @@ class LoginViewModel @ViewModelInject constructor(
     val loginSuccess : LiveData<ValueWrapper<Boolean>>
     get() = _loginSuccess
 
-    fun login(user: String) {
+    fun login(user: String, password: String) {
         ioThread.launch {
             _loading.postValue(ValueWrapper(true))
             val operators = getOperators().body() ?: listOf()
@@ -40,12 +40,14 @@ class LoginViewModel @ViewModelInject constructor(
                 run loop@ {
                     var found = false
                     operators.forEach {
-                        if (it.user == user) {
-                            found = true
-                            mainRepositoryImpl.liveOperator.postValue(it)
-                            _messages.postValue("Usuario Encontrado")
-                            _loginSuccess.postValue(ValueWrapper(true))
-                            return@loop
+                        if (it.user == user && it.password == password) {
+                            if (it.allowLogin == true){
+                                found = true
+                                mainRepositoryImpl.liveOperator.postValue(it)
+                                _messages.postValue("Usuario Encontrado")
+                                _loginSuccess.postValue(ValueWrapper(true))
+                                return@loop
+                            }
                         }
                     }
                     if (found) {

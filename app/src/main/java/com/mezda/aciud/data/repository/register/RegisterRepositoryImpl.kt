@@ -18,12 +18,13 @@ class RegisterRepositoryImpl (
         return apiCalls.getSupervisors(preference.pwdApp())
     }
 
-    suspend fun postOperator(user: String, name: String, supervisorId: Int): Response<Int> {
+    suspend fun postOperator(user: String, password: String, name: String, supervisorId: Int): Response<Int> {
         val map = mutableMapOf<String, Any>()
         map["Idoperador"] = 0
         map["Idresponsable"] = supervisorId
-        map["Usuario"] = user
-        map["Nombre"] = name
+        map["IAppLogin"] = user
+        map["IAppNombre"] = name
+        map["IAppPwd"] = password
         val requestBody = JSONObject(map as Map<*, *>).toString().toRequestBody(ACIUDApp.mediaType)
         return apiCalls.postOperator(preference.pwdApp(),requestBody)
     }

@@ -71,9 +71,10 @@ class RegisterFragment : BaseFragment() {
         binding.registerButton.setOnClickListener {
             val user = binding.userTextInputLayout.editText?.text.toString()
             val name = binding.nameTextInputLayout.editText?.text.toString()
+            val password = binding.passwordTextInputLayout.editText?.text.toString()
             val supervisorId = binding.supervisorSpinner.selectedItemPosition
             if (validateFormNotEmpty()) {
-                registerViewModel.onRegisterUser(user, name, supervisorId)
+                registerViewModel.onRegisterUser(user, password, name, supervisorId)
             }
         }
         return binding.root
@@ -85,6 +86,10 @@ class RegisterFragment : BaseFragment() {
         return when {
             binding.userTextInputLayout.editText?.text.toString().isEmpty() -> {
                 binding.userTextInputLayout.error = "Requerido"
+                false
+            }
+            binding.passwordTextInputLayout.editText?.text.toString().isEmpty() -> {
+                binding.passwordTextInputLayout.error = "Requerido"
                 false
             }
             binding.nameTextInputLayout.editText?.text.toString().isEmpty() -> {

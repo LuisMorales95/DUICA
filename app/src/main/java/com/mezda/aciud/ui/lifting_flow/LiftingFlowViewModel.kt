@@ -363,6 +363,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
                 Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
 
 
+
                 val response = sendInfo(liftingInfo!!)
                 _loading.postValue(false)
                 if (response.isSuccessful) {
@@ -388,6 +389,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
     }
 
     fun mapLiftingToModels(lifting: LiftingInfo) {
+        this.liftingInfo = liftingInfo
         userInfo = UserInfo(
             lifting.name ?: "",
             lifting.paternal_surname ?: "",
@@ -395,6 +397,34 @@ class LiftingFlowViewModel @ViewModelInject constructor(
             lifting.phone ?: "",
             picture_url = lifting.image
         )
-        TODO("map the rest of the objects")
+
+        directionInfo = DirectionInfo(
+            lifting.street,
+            (lifting.number ?: "0").toInt(),
+            locality = Locality.getDefault().nameLocality,
+            localityId = Locality.getDefault().idLocality,
+            sectionId = lifting.sectionId,
+            section = lifting.section,
+            suburbId = lifting.idSuburb
+        )
+
+        geolocationinfo = GeoLocationInfo(
+            (lifting.latitude ?: "0.0").toDouble(),
+            (lifting.longitude ?: "0.0").toDouble()
+        )
+
+        occupationInfo = OccupationInfo(
+            lifting.professionId,
+            "",
+            supportTypesId = lifting.supportTypeId,
+            supportTypes = "",
+            observation = lifting.observations
+        )
+
+        partyInfo = PartyInfo(
+            lifting.sympathizer,
+            lifting.idFlag,
+            ""
+        )
     }
 }

@@ -78,7 +78,25 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/medium_margin">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/suburb_auto_complete"
+                        style="@style/Widget.AppCompat.EditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/suburb"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="@dimen/edittext_vertical_size"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/medium_margin">
 
                     <AutoCompleteTextView
                         android:id="@+id/section_auto_complete"
@@ -104,23 +122,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/medium_margin"
                     tools:listitem="@android:layout/simple_dropdown_item_1line" />-->
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/medium_margin">
-
-                    <AutoCompleteTextView
-                        android:id="@+id/suburb_auto_complete"
-                        style="@style/Widget.AppCompat.EditText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/suburb"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="@dimen/edittext_vertical_size"
-                        android:textSize="16sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-
 
                 <Button
                     android:id="@+id/next_button"

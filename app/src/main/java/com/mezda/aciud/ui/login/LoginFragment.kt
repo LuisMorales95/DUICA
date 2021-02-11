@@ -36,14 +36,13 @@ class LoginFragment : BaseFragment() {
             launchDirection(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
         }
 
-
         binding.startButton.setOnClickListener {
             val user = binding.userTextInputLayout.editText?.text?.toString() ?: ""
-            if (user.isEmpty()) {
-                binding.userTextInputLayout.error = "Usuario Requerido"
-            } else {
+            val password = binding.userTextInputLayout.editText?.text?.toString() ?: ""
+            if (validParameters()) {
                 binding.userTextInputLayout.isErrorEnabled = false
-                loginViewModel.login(user)
+                binding.passwordTextInputLayout.isErrorEnabled = false
+                loginViewModel.login(user, password)
             }
         }
 
@@ -68,11 +67,26 @@ class LoginFragment : BaseFragment() {
         return binding.root
     }
 
+    private fun validParameters(): Boolean {
+        return when {
+            binding.userTextInputLayout.editText?.text.toString().isEmpty() -> {
+                binding.userTextInputLayout.error = "Usuario requerido"
+                false
+            }
+            binding.passwordTextInputLayout.editText?.text.toString().isEmpty() -> {
+                binding.passwordTextInputLayout.error = "Contraseña requerido"
+                false
+            }
+            else -> true
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Glide.with(requireView()).load(R.drawable.aciud).into(binding.logoImage)
         Glide.with(requireView()).load(R.drawable.morena_logo).into(binding.imageView)
-        binding.userTextInputLayout.editText?.setText("Admin")
+        binding.userTextInputLayout.editText?.setText("TEST")
+        binding.passwordTextInputLayout.editText?.setText("TEST")
     }
 
     companion object {

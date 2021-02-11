@@ -51,10 +51,10 @@ class RegisterViewModel @ViewModelInject constructor(
         return registerRepositoryImpl.getSupervisors()
     }
 
-    fun onRegisterUser(user: String, name: String, supervisorId: Int) {
+    fun onRegisterUser(user: String, password:String, name: String, supervisorId: Int) {
         ioThread.launch {
             _loading.postValue(ValueWrapper(true))
-            val response = registerUser(user, name, supervisorId)
+            val response = registerUser(user, password, name, supervisorId)
             _loading.postValue(ValueWrapper(false))
             if (response.isSuccessful) {
                 if ((response.body() ?: 0) > 0) {
@@ -69,14 +69,14 @@ class RegisterViewModel @ViewModelInject constructor(
         }
     }
 
-    private suspend fun registerUser(user: String, name: String, supervisorId: Int): Response<Int> {
+    private suspend fun registerUser(user: String, password: String, name: String, supervisorId: Int): Response<Int> {
         var idSupervisor = 0
         _supervisors.value?.forEachIndexed { index, supervisor ->
             if ((supervisorId - 1) == index) {
                 idSupervisor = supervisor.supervisorId ?: 0
             }
         }
-        return registerRepositoryImpl.postOperator(user, name, idSupervisor)
+        return registerRepositoryImpl.postOperator(user, password, name, idSupervisor)
     }
 
     fun registerSuccessful() {

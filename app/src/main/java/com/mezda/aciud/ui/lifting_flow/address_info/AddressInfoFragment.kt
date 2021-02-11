@@ -41,18 +41,6 @@ class AddressInfoFragment: BaseFragment(), View.OnClickListener {
         binding.localityTextView.text = Locality.getDefault().nameLocality
         binding.localitySpinner.visibility = View.GONE
 
-        viewModel.section.observe(viewLifecycleOwner) {
-            val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
-                requireContext(),
-                android.R.layout.simple_dropdown_item_1line,
-                it.toTypedArray()
-            )
-            binding.sectionAutoComplete.setAdapter(adapter)
-            binding.sectionAutoComplete.validator = SectionAutoCompleteValidator(it)
-            binding.sectionAutoComplete.onFocusChangeListener = SectionFocusListener()
-            binding.sectionAutoComplete.setText(viewModel.getSection())
-        }
-
         viewModel.suburb.observe(viewLifecycleOwner, {
             val adapter: ArrayAdapter<String> = ArrayAdapter(
                 requireContext(),
@@ -65,6 +53,18 @@ class AddressInfoFragment: BaseFragment(), View.OnClickListener {
             binding.suburbAutoComplete.onFocusChangeListener = SuburbFocusListener()
             binding.suburbAutoComplete.setText(viewModel.getSuburb())
         })
+
+        viewModel.section.observe(viewLifecycleOwner) {
+            val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                it.toTypedArray()
+            )
+            binding.sectionAutoComplete.setAdapter(adapter)
+            binding.sectionAutoComplete.validator = SectionAutoCompleteValidator(it)
+            binding.sectionAutoComplete.onFocusChangeListener = SectionFocusListener()
+            binding.sectionAutoComplete.setText(viewModel.getSection())
+        }
 
         viewModel.onGetSections()
         viewModel.onLocalityByDefault()
