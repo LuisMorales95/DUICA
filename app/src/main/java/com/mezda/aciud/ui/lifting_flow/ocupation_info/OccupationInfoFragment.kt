@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.navGraphViewModels
 import com.mezda.aciud.R
@@ -32,6 +33,13 @@ class OccupationInfoFragment : BaseFragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_occupation, container, false)
+
+        viewModel.messages.observe(viewLifecycleOwner, {
+            if (it.isNotEmpty()) {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                viewModel.messageShown()
+            }
+        })
 
         viewModel.profession.observe(viewLifecycleOwner) {
             binding.professionSpinner.adapter = ArrayAdapter(

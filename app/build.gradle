@@ -7,23 +7,36 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        ACIUDKEY {
+            storeFile file('D:\\RemoteAndroidStudioProjects\\ACIUD\\ACIUDKey.jks')
+            storePassword 'AcIuD2021'
+            keyAlias 'ACUIDKey2021'
+            keyPassword 'AcIuD2021'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
-
     defaultConfig {
         applicationId "com.mezda.aciud"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
+            applicationVariants.all { variant ->
+                variant.outputs.all { output ->
+                    outputFileName = new File("ACIUD${versionCode}_${variant.versionName}.apk")
+                }
+
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.ACIUDKEY
         }
     }
     compileOptions {

@@ -4,10 +4,7 @@ import com.mezda.aciud.data.models.*
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface ApiCalls {
 
@@ -44,6 +41,12 @@ interface ApiCalls {
         @Body body: RequestBody
     ): Response<Int>
 
+    @PUT("api/Levantamiento")
+    suspend fun updateLifting(
+        @Query("pwdApp") password: String,
+        @Body body: RequestBody
+    ): Response<Int>
+
     @GET("api/Consultas/GetLevantamiento")
     suspend fun getLifting(
         @Query("pwdApp") password: String,
@@ -58,6 +61,13 @@ interface ApiCalls {
         @Query("idseccion") idSection: String = "null",
         @Query("seccion") section: String = "null",
     ): Response<List<Section>>
+
+    @GET("api/Consultas/GetSeccionByColonia")
+    suspend fun getSectionBySuburb(
+        @Query("pwdApp") password: String,
+        @Query("idseccion") idSection: String = "null",
+        @Query("idcolonia") idSuburb: String,
+    ) : Response<List<Section>>
 
     @GET("api/Consultas/GetProfesion")
     suspend fun getProfession(

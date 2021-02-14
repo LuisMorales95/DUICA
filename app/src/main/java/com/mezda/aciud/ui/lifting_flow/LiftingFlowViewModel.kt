@@ -39,7 +39,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
     /**UserInfo*/
 
     var userInfo: UserInfo = UserInfo(
-//        "Luis", "Morales", "Perez", "9212222222"
+        "Luis", "Morales", "Perez", "9212222222"
     )
 
     fun saveUserInfo(
@@ -68,30 +68,6 @@ class LiftingFlowViewModel @ViewModelInject constructor(
 //        "Araucaria", 10, "COATZACOALCOS", 1, "4723", 215, "20 DE NOVIEMBRE               ", 2
     )
 
-    private val _section = MutableLiveData<List<Section>>()
-    val section = Transformations.map(_section) {
-        val list = mutableListOf<String>()
-        list.add("Selecciona una seccion")
-        it.forEach {
-            list.add(it.section)
-        }
-        list
-    }
-
-    fun getSection(): String {
-        var sectionName = ""
-        run loop@{
-            _section.value?.forEach {
-                if (directionInfo.sectionId == it.idSection) {
-                    sectionName = it.section
-                    return@loop
-                }
-            }
-        }
-        Timber.e("getSection: $sectionName")
-        return sectionName
-    }
-
     private val _suburb = MutableLiveData<List<Suburb>>()
     val suburb = Transformations.map(_suburb) {
         val list = mutableListOf<String>()
@@ -116,10 +92,56 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         return suburbName
     }
 
-    fun onGetSections() {
+    private val _section = MutableLiveData<List<Section>>()
+    val section = Transformations.map(_section) {
+        val list = mutableListOf<String>()
+        list.add("Selecciona una seccion")
+        it.forEach {
+            list.add(it.section)
+        }
+        list
+    }
+
+    fun getSection(): String {
+        var sectionName = ""
+        run loop@{
+            _section.value?.forEach {
+                if (directionInfo.sectionId == it.idSection) {
+                    sectionName = it.section
+                    return@loop
+                }
+            }
+        }
+        Timber.e("getSection: $sectionName")
+        return sectionName
+    }
+
+    fun onGetSections(suburb: String) {
         ioThread.launch {
-            val sections = liftingRepositoryImpl.getSection()
-            _section.postValue(sections)
+            _section.postValue(listOf())
+            var suburbId = -1
+            run loop@{
+                _suburb.value?.forEach {
+                    if (suburb == it.nameSuburb) {
+                        suburbId = it.idSuburb ?: 0
+                        return@loop
+                    }
+                }
+            }
+
+            if (suburbId != -1) {
+                val sections = liftingRepositoryImpl.getSectionBySuburb(suburbId.toString())
+                if (sections.isEmpty()) {
+                    _section.postValue(listOf())
+                    _messages.postValue("NO SE ENCONTRARON SECCIÓNES")
+                    return@launch
+                }
+                _section.postValue(sections)
+                _messages.postValue("Secciónes Cargadas")
+                return@launch
+            }
+
+            _messages.postValue("Colonia Invalida")
         }
     }
 
@@ -143,18 +165,23 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         street_number: String,
         section: String,
         suburb: String
-    ) {
-        var sectionId = 0
+    ): Boolean {
+
+        var sectionId = -1
         run loop@{
-            _section.value?.forEachIndexed { index, s ->
+            _section.value?.forEachIndexed { _, s ->
                 if (s.section == section) {
-                    sectionId = index
+                    sectionId = s.idSection
                     return@loop
                 }
             }
         }
+        if (sectionId == -1) {
+            _messages.postValue("Seccion Invalida")
+            return false
+        }
 
-        var suburbId = 0
+        var suburbId = -1
         run loop@{
             _suburb.value?.forEachIndexed { _, suburbs ->
                 if (suburbs.nameSuburb == suburb) {
@@ -162,6 +189,10 @@ class LiftingFlowViewModel @ViewModelInject constructor(
                     return@loop
                 }
             }
+        }
+        if (suburbId == -1) {
+            _messages.postValue("Seccion Invalida")
+            return false
         }
 
         directionInfo.apply {
@@ -175,6 +206,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
             this.suburbId = suburbId
         }
         Timber.e("directionInfo: ${Gson().toJson(directionInfo)}")
+        return true
     }
 
     /**GeoLocationInfo*/
@@ -317,7 +349,8 @@ class LiftingFlowViewModel @ViewModelInject constructor(
             Timber.e("partyInfo: ${Gson().toJson(partyInfo)}")
             occupationInfo.apply {
                 this.professionId = _profession.value?.get(profession_position - 1)?.id ?: 0
-                this.profession = _profession.value?.get(profession_position - 1)?.profession ?: ""
+                this.profession =
+                    _profession.value?.get(profession_position - 1)?.profession ?: ""
                 this.supportTypesId = _supportType.value?.get(supportType_position - 1)?.id ?: 0
                 this.supportTypes =
                     _supportType.value?.get(supportType_position - 1)?.supportType ?: ""
@@ -326,8 +359,10 @@ class LiftingFlowViewModel @ViewModelInject constructor(
             Timber.e("occupationInfo: ${Gson().toJson(occupationInfo)}")
         }
     }
+
     val format = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-//    val format = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+
+    //    val format = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
     @SuppressLint("SimpleDateFormat")
     fun sendLifting() {
         ioThread.launch {
@@ -363,8 +398,10 @@ class LiftingFlowViewModel @ViewModelInject constructor(
                 Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
 
 
-
-                val response = sendInfo(liftingInfo!!)
+                val response = when(liftingInfo?.idLifting == 0) {
+                    true -> sendInfo(liftingInfo!!)
+                    false -> updateInfo(liftingInfo!!)
+                }
                 _loading.postValue(false)
                 if (response.isSuccessful) {
                     if ((response.body() ?: 0) > 0) {
@@ -388,8 +425,13 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         return liftingRepositoryImpl.sendLifting(liftingInfo)
     }
 
+    private suspend fun updateInfo(liftingInfo: LiftingInfo): Response<Int> {
+        return liftingRepositoryImpl.updateLifting(liftingInfo)
+    }
+
     fun mapLiftingToModels(lifting: LiftingInfo) {
-        this.liftingInfo = liftingInfo
+        this.liftingInfo = lifting
+        Timber.e(Gson().toJson(this.liftingInfo))
         userInfo = UserInfo(
             lifting.name ?: "",
             lifting.paternal_surname ?: "",

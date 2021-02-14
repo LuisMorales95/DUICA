@@ -8,5 +8,14 @@ data class Section(
         @SerializedName("Seccion")
         var section: String = "",
         @SerializedName("IdMun")
-        var idMunicipality: Int = 0
+        var idMunicipality: Int = 0,
+
+        @SerializedName("IdRel")
+        var idRel: Int = 0,
+
+        @SerializedName("Idcolonia")
+        var idColonia: Int = 0,
+
+        @SerializedName("COLONIA")
+        var suburb: String = ""
 )

@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.Glide
@@ -44,7 +45,12 @@ class PreviewInfoFragment : BaseFragment(), View.OnClickListener {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_preview_info, container, false)
 
         loadingDialog = LoadingDialog(requireActivity())
-
+        viewModel.messages.observe(viewLifecycleOwner, {
+            if (it.isNotEmpty()) {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                viewModel.messageShown()
+            }
+        })
         viewModel.loading.observe(viewLifecycleOwner,{
             if (it){
                 loadingDialog.apply {

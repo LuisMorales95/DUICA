@@ -34,6 +34,17 @@ class LiftingRepositoryImpl(
         return apiCalls.sendLifting(preference.pwdApp(), body)
     }
 
+    suspend fun updateLifting(liftingInfo: LiftingInfo): Response<Int> {
+        val body = Gson().toJson(liftingInfo).toRequestBody(ACIUDApp.mediaType)
+        return apiCalls.updateLifting(preference.pwdApp(), body)
+    }
+
+    suspend fun getSectionBySuburb(suburbId: String): List<Section> {
+        val response = apiCalls.getSectionBySuburb(preference.pwdApp(),idSuburb = suburbId)
+        return if (response.isSuccessful) {
+            response.body() ?: listOf()
+        } else listOf()
+    }
     suspend fun getSection(): List<Section> {
         val response = apiCalls.getSection(preference.pwdApp())
         return if (response.isSuccessful) {

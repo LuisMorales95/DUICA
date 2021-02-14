@@ -13,7 +13,6 @@ abstract class BaseFragment: Fragment() {
     fun launchDirection(navDirections: NavDirections) {
         try {
             Navigation.findNavController(requireView()).navigate(navDirections)
-//            findNavController().navigate(navDirections)
         } catch(exception: Exception) {
             Timber.e(exception)
             /*uiScope.launch {

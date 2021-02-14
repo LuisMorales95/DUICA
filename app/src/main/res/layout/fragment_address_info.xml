@@ -76,22 +76,34 @@
                     android:textStyle="bold"
                     tools:text="@string/locality" />
 
-                <com.google.android.material.textfield.TextInputLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/medium_margin">
+                    android:orientation="horizontal">
 
-                    <AutoCompleteTextView
-                        android:id="@+id/suburb_auto_complete"
-                        style="@style/Widget.AppCompat.EditText"
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/suburb"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="@dimen/edittext_vertical_size"
-                        android:textSize="16sp" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_weight="1">
 
+                        <AutoCompleteTextView
+                            android:id="@+id/suburb_auto_complete"
+                            style="@style/Widget.AppCompat.EditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/suburb"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="@dimen/edittext_vertical_size"
+                            android:textSize="16sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <Button
+                        android:id="@+id/section_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="@dimen/medium_margin"
+                        android:text="Cargar \nSeccion" />
+                </LinearLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
@@ -110,7 +122,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <Spinner
-                    android:id="@+id/locality_spinner"
+                    android:id="@+id/section_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/medium_margin"

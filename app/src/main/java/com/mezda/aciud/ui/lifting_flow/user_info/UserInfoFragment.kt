@@ -75,6 +75,14 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
                 Glide.with(requireContext()).load(Uri.parse(it)).circleCrop().into(binding.profilePictureImage)
             }
         }
+
+        viewModel.messages.observe(viewLifecycleOwner, {
+            if (it.isNotEmpty()) {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                viewModel.messageShown()
+            }
+        })
+
         binding.userNameText.editText?.setText(viewModel.userInfo.name)
         binding.userPaternalText.editText?.setText(viewModel.userInfo.paternal_last_name)
         binding.userMaternalText.editText?.setText(viewModel.userInfo.maternal_last_name)

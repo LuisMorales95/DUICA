@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.mezda.aciud.ui.map
 
 import android.annotation.SuppressLint

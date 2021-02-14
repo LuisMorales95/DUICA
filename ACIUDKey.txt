@@ -1,0 +1,9 @@
+D:\RemoteAndroidStudioProjects\ACIUD\ACIUDKey.jks
+PassWord: AcIuD2021
+Alias: ACUIDKey2021
+First and Last Name: Jose Luis Morales Perez
+Organizational Unit: ACIUD
+Organization: Atencion Ciudadana
+City or Locality: Mexico
+State or Province: Veracruz
+Country Code: 52
