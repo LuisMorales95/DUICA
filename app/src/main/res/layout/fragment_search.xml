@@ -7,68 +7,87 @@
 
     </data>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="@dimen/small_margin"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/locality_textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/medium_margin"
-            android:gravity="center"
-            android:padding="@dimen/medium_padding"
-            android:text="@string/locality"
-            android:textStyle="bold"
-            tools:text="@string/locality" />
-
-        <Spinner
-            android:id="@+id/locality_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:listitem="@android:layout/simple_dropdown_item_1line" />
-
-        <Spinner
-            android:id="@+id/suburb_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:listitem="@android:layout/simple_dropdown_item_1line" />
-
-        <Spinner
-            android:id="@+id/operator_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:visibility="visible"
-            tools:listitem="@android:layout/simple_dropdown_item_1line" />
-
-        <Button
-            android:id="@+id/search_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:text="@string/search" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/lifting_recycler"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginTop="@dimen/medium_margin" />
+            android:layout_margin="@dimen/small_margin"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <Button
-            android:id="@+id/map_list"
-            android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/locality_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/medium_margin"
+                android:gravity="center"
+                android:padding="@dimen/medium_padding"
+                android:text="@string/locality"
+                android:textStyle="bold"
+                tools:text="@string/locality" />
+
+            <Spinner
+                android:id="@+id/locality_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:listitem="@android:layout/simple_dropdown_item_1line" />
+
+            <Spinner
+                android:id="@+id/suburb_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:listitem="@android:layout/simple_dropdown_item_1line" />
+
+            <Spinner
+                android:id="@+id/operator_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:listitem="@android:layout/simple_dropdown_item_1line"
+                tools:visibility="visible" />
+
+            <Button
+                android:id="@+id/search_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/search"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/lifting_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/medium_margin"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/map_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Mapear Levantamientos" />
+
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_fab"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mapear Levantamientos"/>
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@color/redLight"
+            android:src="@drawable/ic_add"
+            android:tint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </LinearLayout>
 </layout>

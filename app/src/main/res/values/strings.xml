@@ -35,4 +35,10 @@
     <string name="date_hour_format" translatable="false">yyyyMMdd_HHmmss</string>
     <string name="file_provider_package" translatable="false">com.example.android.fileprovider</string>
     <string name="validate_information">Verifica Información</string>
+    <string name="label_rol">Rol</string>
+    <string name="label_permission">permission</string>
+    <string name="label_active">Activo</string>
+    <string name="label_admin">Admin</string>
+    <string name="label_capture">Capturar</string>
+    <string name="label_modify">Modificar</string>
 </resources>

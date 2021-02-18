@@ -13,13 +13,14 @@ import com.mezda.aciud.databinding.RowLiftingItemBinding
 class LiftingAdapter(private val liftingListener: LiftingListener) : RecyclerView.Adapter<LiftingAdapter.LiftingViewHolder>() {
 
     private var list = mutableListOf<LiftingInfo>()
+    private var permissionModify = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LiftingViewHolder {
         return LiftingViewHolder.getViewHolder(parent)
     }
 
     override fun onBindViewHolder(holder: LiftingViewHolder, position: Int) {
-        holder.bind(list[position],liftingListener)
+        holder.bind(list[position],liftingListener, permissionModify)
     }
 
     override fun getItemCount(): Int {
@@ -37,10 +38,11 @@ class LiftingAdapter(private val liftingListener: LiftingListener) : RecyclerVie
         }
 
         @SuppressLint("SetTextI18n")
-        fun bind(liftingInfo: LiftingInfo, liftingListener: LiftingListener) {
+        fun bind(liftingInfo: LiftingInfo, liftingListener: LiftingListener, permissionModify: Boolean) {
             binding.textView4.text = "${liftingInfo.idLifting}"
             binding.textView2.text = "${liftingInfo.name} ${liftingInfo.paternal_surname} ${liftingInfo.maternal_surname}"
             binding.textView3.text = "${liftingInfo.number} ${liftingInfo.street}"
+            binding.imageEdit.visibility = if (permissionModify) View.VISIBLE else View.GONE
             binding.imageMap.setOnClickListener {
                 liftingListener.onMap(liftingInfo)
             }
@@ -52,6 +54,11 @@ class LiftingAdapter(private val liftingListener: LiftingListener) : RecyclerVie
 
     fun submit(list: MutableList<LiftingInfo>){
         this.list = list
+        notifyDataSetChanged()
+    }
+
+    fun setPermissionModify(modify: Boolean){
+        this.permissionModify = modify
         notifyDataSetChanged()
     }
 

@@ -39,7 +39,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
     /**UserInfo*/
 
     var userInfo: UserInfo = UserInfo(
-        "Luis", "Morales", "Perez", "9212222222"
+        //"Luis", "Morales", "Perez", "9212222222"
     )
 
     fun saveUserInfo(

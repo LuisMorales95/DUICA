@@ -85,8 +85,8 @@ class LoginFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         Glide.with(requireView()).load(R.drawable.aciud).into(binding.logoImage)
         Glide.with(requireView()).load(R.drawable.morena_logo).into(binding.imageView)
-        binding.userTextInputLayout.editText?.setText("TEST")
-        binding.passwordTextInputLayout.editText?.setText("TEST")
+        // binding.userTextInputLayout.editText?.setText("TEST")
+        // binding.passwordTextInputLayout.editText?.setText("TEST")
     }
 
     companion object {

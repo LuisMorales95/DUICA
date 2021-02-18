@@ -7,6 +7,7 @@ import com.mezda.aciud.data.models.*
 import com.mezda.aciud.data.repository.main.MainRepositoryImpl
 import com.mezda.aciud.data.repository.search.SearchRepositoryImpl
 import com.mezda.aciud.ui.BaseViewModel
+import com.mezda.aciud.utils.ValueWrapper
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
@@ -29,7 +30,34 @@ class SearchViewModel @ViewModelInject constructor(
         ioThread.launch {
             _liftingData.postValue(mutableListOf())
             findLifting()
+            refreshOperator()
         }
+    }
+
+    fun refreshOperator() {
+        ioThread.launch {
+            val operators = searchRepositoryImpl.getOperators().body() ?: listOf()
+            if (operators.isEmpty()) {
+                _messages.postValue("Sin usuarios")
+            } else {
+                run loop@{
+                    var found = false
+                    operators.forEach {
+                        if (_operator.value?.operatorId == it.operatorId) {
+                            found = true
+                            mainRepositoryImpl.liveOperator.postValue(it)
+                            return@loop
+                        }
+                    }
+                    if (!found) {
+                        _messages.postValue("Tu usuario no se encontro")
+                    } else {
+                        _messages.postValue("User found")
+                    }
+                }
+            }
+        }
+
     }
 
     private fun findLifting() {
@@ -39,7 +67,7 @@ class SearchViewModel @ViewModelInject constructor(
                     ?: 0, _operator.value?.operatorId ?: 0
             )
             if (lifting.isSuccessful) {
-                _liftingData.postValue(lifting.body()?.toMutableList())
+                _liftingData.postValue(lifting.body()?.reversed()?.toMutableList())
             }
         }
     }

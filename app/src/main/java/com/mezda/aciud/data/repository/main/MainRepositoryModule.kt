@@ -1,5 +1,7 @@
 package com.mezda.aciud.data.repository.main
 
+import com.mezda.aciud.data.api.ApiCalls
+import com.mezda.aciud.data.preference.Preference
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

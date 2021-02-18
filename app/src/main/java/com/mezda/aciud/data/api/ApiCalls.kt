@@ -84,4 +84,10 @@ interface ApiCalls {
     suspend fun getFlags(
         @Query("pwdApp") password: String
     ): Response<List<Flag>>
+
+    @PUT("api/Operadores")
+    suspend fun updateOperator(
+        @Query("pwdApp") password: String,
+        @Body body: RequestBody
+    ): Response<Int>
 }

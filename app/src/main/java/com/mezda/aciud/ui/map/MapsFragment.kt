@@ -78,11 +78,14 @@ class MapsFragment : Fragment(), View.OnClickListener {
         googleMap.setOnMarkerClickListener { marker ->
             run loop@ {
                 args.locations.list.forEach { liftingInfo ->
-                    if ((marker.tag as Int) == liftingInfo.idLifting) {
-                        binding.pictureImageView.visibility = View.VISIBLE
-                        Glide.with(requireContext()).load(buildImageUrlString(liftingInfo)).into(binding.pictureImageView)
-                        return@loop
+                    marker.tag?.let {
+                        if ((it as Int) == liftingInfo.idLifting) {
+                            binding.pictureImageView.visibility = View.VISIBLE
+                            Glide.with(requireContext()).load(buildImageUrlString(liftingInfo)).into(binding.pictureImageView)
+                            return@loop
+                        }
                     }
+
                 }
             }
 

@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import com.mezda.aciud.R
 import com.mezda.aciud.data.models.LiftingInfo
 import com.mezda.aciud.data.models.Locality
@@ -23,6 +24,7 @@ import com.mezda.aciud.utils.LiftingAdapter
 import com.mezda.aciud.utils.SuburbAutoCompleteValidator
 import com.mezda.aciud.utils.SuburbFocusListener
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
@@ -32,6 +34,7 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
     private lateinit var liftingAdapter: LiftingAdapter
     private val searchViewModel by viewModels<SearchViewModel>()
     private var isAdmin = false
+    private var accountsMenuItem: MenuItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,9 +42,25 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
         setHasOptionsMenu(true)
+        return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.lifting_menu, menu)
+        accountsMenuItem = menu.findItem(R.id.action_accounts)
+        accountsMenuItem?.isVisible = false
+        super.onCreateOptionsMenu(menu, inflater)
+        initComponent()
+    }
+
+    private fun initComponent() {
         liftingAdapter = LiftingAdapter(
             LiftingAdapter.LiftingListener(editListener = { liftingInfo: LiftingInfo ->
-                launchDirection(SearchFragmentDirections.actionSearchFragmentToUserInfoFragment(liftingInfo))
+                launchDirection(
+                    SearchFragmentDirections.actionSearchFragmentToUserInfoFragment(
+                        liftingInfo
+                    )
+                )
             }, mapListener = { info: LiftingInfo ->
                 val locations = Locations(mutableListOf(info), singleLocation = true)
                 launchDirection(
@@ -52,20 +71,22 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
             })
         )
         binding.liftingRecycler.adapter = liftingAdapter
-        binding.liftingRecycler.layoutManager =
-            LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+        binding.liftingRecycler.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         binding.liftingRecycler.setHasFixedSize(true)
         binding.localityTextView.text = Locality.getDefault().nameLocality
-        //binding.localityTextView.visibility = View.GONE
 
         searchViewModel.operator.observe(viewLifecycleOwner, {
+            Timber.e(Gson().toJson(it))
             (requireActivity() as MainActivity).supportActionBar?.title = it.name
-            if (it.name == "Administrador") {
+            if (it.isAdmin == true) {
                 isAdmin = true
+                accountsMenuItem?.isVisible = true
                 binding.operatorSpinner.visibility = View.VISIBLE
                 searchViewModel.onOperator()
                 binding.searchButton.visibility = View.VISIBLE
             }
+            liftingAdapter.setPermissionModify(it.allowModification ?: false)
+            binding.addFab.visibility = if (it.allowCapture == true) View.VISIBLE else View.GONE
         })
 
         searchViewModel.operatorList.observe(viewLifecycleOwner, {
@@ -86,27 +107,30 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
             }
             liftingAdapter.submit(it)
         })
-
+        searchViewModel.messages.observe(viewLifecycleOwner, {
+            if (it.isNotEmpty()) {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                searchViewModel.messageShown()
+            }
+        })
 
         searchViewModel.onStart()
         binding.searchButton.setOnClickListener(this)
         binding.mapList.setOnClickListener(this)
-        return binding.root
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.lifting_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
+        binding.addFab.setOnClickListener(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_add -> {
-                findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToLiftingFragment())
+            R.id.action_accounts -> {
+                launchDirection(SearchFragmentDirections.actionSearchFragmentToUsersFragment())
             }
-            R.id.action_flow -> {
-                findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToUserInfoFragment())
-            }
+            //R.id.action_add -> {
+            //    findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToLiftingFragment())
+            //}
+            //R.id.action_flow -> {
+            //    findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToUserInfoFragment())
+            //}
         }
         return super.onOptionsItemSelected(item)
     }
@@ -134,6 +158,9 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
                 launchDirection(
                     SearchFragmentDirections.actionSearchFragmentToMapsFragment(locations)
                 )
+            }
+            binding.addFab.id -> {
+                findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToUserInfoFragment())
             }
         }
     }
