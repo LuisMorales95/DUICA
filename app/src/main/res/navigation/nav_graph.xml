@@ -47,6 +47,14 @@
         <action
             android:id="@+id/action_searchFragment_to_usersFragment"
             app:destination="@id/usersFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_supportFragment"
+            app:destination="@id/nav_support">
+            <argument
+                android:name="IdLift"
+                android:defaultValue="0"
+                app:argType="integer" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/mapsFragment"
@@ -115,4 +123,25 @@
         android:name="com.mezda.aciud.ui.users.UsersFragment"
         android:label="Cuentas"
         tools:layout="@layout/fragment_users"/>
+    <navigation android:id="@+id/nav_support"
+        app:startDestination="@id/supportFragment">
+        <fragment
+            android:id="@+id/supportFragment"
+            android:name="com.mezda.aciud.ui.support.list.SupportListFragment"
+            android:label="Apoyos"
+            tools:layout="@layout/fragment_support">
+            <argument
+                android:name="IdLift"
+                android:defaultValue="0"
+                app:argType="integer" />
+            <action
+                android:id="@+id/action_supportFragment_to_supportNewFragment"
+                app:destination="@id/supportNewFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/supportNewFragment"
+            android:name="com.mezda.aciud.ui.support.create.SupportNewFragment"
+            android:label="fragment_new_support"
+            tools:layout="@layout/fragment_new_support" />
+    </navigation>
 </navigation>

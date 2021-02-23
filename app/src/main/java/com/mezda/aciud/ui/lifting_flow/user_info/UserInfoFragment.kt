@@ -20,6 +20,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.Glide
 import com.mezda.aciud.R
+import com.mezda.aciud.data.RetrofitModule
 import com.mezda.aciud.databinding.FragmentUserInfoBinding
 import com.mezda.aciud.ui.BaseFragment
 import com.mezda.aciud.ui.lifting_flow.LiftingFlowViewModel
@@ -68,6 +69,12 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
         Glide.with(requireContext()).load(R.drawable.profile_picture).circleCrop().into(binding.profilePictureImage)
 
         photoEncoded = viewModel.userInfo.picture_encoded
+        viewModel.userInfo.picture_url?.let {
+            if (it != "null") {
+                Timber.e(it)
+                Glide.with(requireContext()).load(RetrofitModule.baseUrl + it.replace("~/", "")).circleCrop().into(binding.profilePictureImage)
+            }
+        }
         viewModel.userInfo.picture_uri?.let {
             if (it != "null") {
                 Timber.e(it)
@@ -169,8 +176,7 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
             val byteArrayOutputStream = ByteArrayOutputStream()
             photoBitmap?.let {
                 it.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream)
-                photoEncoded =
-                    Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT)
+                photoEncoded = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT)
             }
             Glide.with(requireContext()).load(photoUri).circleCrop().into(binding.profilePictureImage)
         }

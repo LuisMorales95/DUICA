@@ -41,4 +41,7 @@
     <string name="label_admin">Admin</string>
     <string name="label_capture">Capturar</string>
     <string name="label_modify">Modificar</string>
+    <string name="support_given">Apoyos Proporcionados</string>
+    <string name="options">Opciones</string>
+    <string name="map">Mapear</string>
 </resources>

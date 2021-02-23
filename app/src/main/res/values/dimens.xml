@@ -6,4 +6,6 @@
     <dimen name="small_margin">4dp</dimen>
     <dimen name="medium_margin">8dp</dimen>
     <dimen name="edittext_vertical_size">17dp</dimen>
+    <dimen name="small_padding">4dp</dimen>
+    <dimen name="large_radius">12dp</dimen>
 </resources>

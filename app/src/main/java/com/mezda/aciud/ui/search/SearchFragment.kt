@@ -1,10 +1,8 @@
 package com.mezda.aciud.ui.search
 
+import android.app.Dialog
 import android.os.Bundle
-import android.text.InputFilter
-import android.text.InputFilter.AllCaps
 import android.view.*
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
@@ -18,11 +16,11 @@ import com.mezda.aciud.data.models.LiftingInfo
 import com.mezda.aciud.data.models.Locality
 import com.mezda.aciud.data.models.Locations
 import com.mezda.aciud.databinding.FragmentSearchBinding
+import com.mezda.aciud.databinding.OptionsMenuBinding
 import com.mezda.aciud.ui.BaseFragment
 import com.mezda.aciud.ui.MainActivity
 import com.mezda.aciud.utils.LiftingAdapter
-import com.mezda.aciud.utils.SuburbAutoCompleteValidator
-import com.mezda.aciud.utils.SuburbFocusListener
+import com.mezda.aciud.utils.enums.EnumOptions
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
@@ -55,19 +53,39 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
 
     private fun initComponent() {
         liftingAdapter = LiftingAdapter(
-            LiftingAdapter.LiftingListener(editListener = { liftingInfo: LiftingInfo ->
-                launchDirection(
-                    SearchFragmentDirections.actionSearchFragmentToUserInfoFragment(
-                        liftingInfo
-                    )
-                )
-            }, mapListener = { info: LiftingInfo ->
-                val locations = Locations(mutableListOf(info), singleLocation = true)
-                launchDirection(
-                    SearchFragmentDirections.actionSearchFragmentToMapsFragment(
-                        locations
-                    )
-                )
+            LiftingAdapter.LiftingListener( selectedItem = {
+                optionsDialog { option ->
+                    when (option) {
+                        EnumOptions.SUPPORT -> {
+                            it.idLifting?.let { id ->
+                                if (id != 0) {
+                                    launchDirection(
+                                        SearchFragmentDirections.actionSearchFragmentToSupportFragment(
+                                            id
+                                        )
+                                    )
+                                    return@let
+                                }
+                                toast("Identificador de Levantamiento Invalido")
+                            }
+                        }
+                        EnumOptions.EDIT -> {
+                            launchDirection(
+                                SearchFragmentDirections.actionSearchFragmentToUserInfoFragment(
+                                    it
+                                )
+                            )
+                        }
+                        EnumOptions.MAP -> {
+                            val locations = Locations(mutableListOf(it), singleLocation = true)
+                            launchDirection(
+                                SearchFragmentDirections.actionSearchFragmentToMapsFragment(
+                                    locations
+                                )
+                            )
+                        }
+                    }
+                }.show()
             })
         )
         binding.liftingRecycler.adapter = liftingAdapter
@@ -163,5 +181,25 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
                 findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToUserInfoFragment())
             }
         }
+    }
+
+    private fun optionsDialog(onSelect: (EnumOptions) -> Unit): Dialog {
+        val dialog = Dialog(requireContext())
+        val binding = OptionsMenuBinding.inflate(dialog.layoutInflater)
+        binding.supportButton.setOnClickListener {
+            onSelect(EnumOptions.SUPPORT)
+            dialog.dismiss()
+        }
+        binding.editButton.setOnClickListener {
+            onSelect(EnumOptions.EDIT)
+            dialog.dismiss()
+        }
+        binding.mapButton.setOnClickListener {
+            onSelect(EnumOptions.MAP)
+            dialog.dismiss()
+        }
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.setContentView(binding.root)
+        return dialog
     }
 }

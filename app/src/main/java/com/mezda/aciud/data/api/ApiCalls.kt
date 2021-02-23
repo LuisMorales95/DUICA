@@ -90,4 +90,16 @@ interface ApiCalls {
         @Query("pwdApp") password: String,
         @Body body: RequestBody
     ): Response<Int>
+
+    @POST("api/ApoyoMultiple")
+    suspend fun sendSupport(
+        @Query("pwdApp") password: String,
+        @Body body: RequestBody
+    ): Response<Int>
+
+    @GET("api/Consultas/GetApoyoMultiple")
+    suspend fun getSupports(
+        @Query("pwdApp") password: String,
+        @Query("idLevantamiento") idLifting: String,
+    ): Response<List<Support>>
 }

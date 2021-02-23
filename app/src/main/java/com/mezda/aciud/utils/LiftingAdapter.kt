@@ -42,12 +42,8 @@ class LiftingAdapter(private val liftingListener: LiftingListener) : RecyclerVie
             binding.textView4.text = "${liftingInfo.idLifting}"
             binding.textView2.text = "${liftingInfo.name} ${liftingInfo.paternal_surname} ${liftingInfo.maternal_surname}"
             binding.textView3.text = "${liftingInfo.number} ${liftingInfo.street}"
-            binding.imageEdit.visibility = if (permissionModify) View.VISIBLE else View.GONE
-            binding.imageMap.setOnClickListener {
-                liftingListener.onMap(liftingInfo)
-            }
-            binding.imageEdit.setOnClickListener {
-                liftingListener.onEdit(liftingInfo)
+            binding.root.setOnClickListener {
+                liftingListener.onSelectItem(liftingInfo)
             }
         }
     }
@@ -66,8 +62,7 @@ class LiftingAdapter(private val liftingListener: LiftingListener) : RecyclerVie
         return this.list
     }
 
-    class LiftingListener(val editListener: (LiftingInfo) -> Unit, val mapListener: (LiftingInfo) -> Unit) {
-        fun onEdit(liftingInfo: LiftingInfo) = editListener(liftingInfo)
-        fun onMap(liftingInfo: LiftingInfo) = mapListener(liftingInfo)
+    class LiftingListener(private  val selectedItem: (LiftingInfo) -> Unit) {
+        fun onSelectItem(liftingInfo: LiftingInfo) = selectedItem(liftingInfo)
     }
 }
