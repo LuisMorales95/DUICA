@@ -195,8 +195,7 @@ class LiftingViewModel @ViewModelInject constructor(
             longitude: String,
             sectionName: String,
             profession: Int,
-            supportTypes: Int,
-            flag: Int,
+             flag: Int,
             observations: String,
             sympathizer: Boolean,
             image: String?
@@ -224,7 +223,6 @@ class LiftingViewModel @ViewModelInject constructor(
             }
 
             val professionId = _profession.value?.get(profession.minus(1))?.id ?: 0
-            val supportTypesId = _supportType.value?.get(supportTypes.minus(1))?.id ?: 0
             val flagId = _flags.value?.get(flag.minus(1))?.id ?: 0
 
             val liftingInfo = LiftingInfo()
@@ -243,7 +241,6 @@ class LiftingViewModel @ViewModelInject constructor(
             liftingInfo.section = _section.value?.get(sectionId)?.section
             liftingInfo.sectionId = _section.value?.get(sectionId)?.idSection
             liftingInfo.professionId = professionId
-            liftingInfo.supportTypeId = supportTypesId
             liftingInfo.observations = observations
             liftingInfo.sympathizer = if (sympathizer) 1 else 2
             liftingInfo.idFlag = flagId

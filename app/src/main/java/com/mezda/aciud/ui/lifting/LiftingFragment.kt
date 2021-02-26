@@ -225,7 +225,6 @@ class LiftingFragment : BaseFragment(), View.OnClickListener {
                             binding.longitudeText.text.toString(),
                             binding.sectionAutoComplete.text.toString(),
                             binding.professionSpinner.selectedItemPosition,
-                            binding.supportTypeSpinner.selectedItemPosition,
                             binding.flagSpinner.selectedItemPosition,
                             binding.observationsTextArea.text.toString(),
                             sympathizer_enabled,

@@ -2,8 +2,10 @@ package com.mezda.aciud.ui.search
 
 import android.app.Dialog
 import android.os.Bundle
+import android.text.InputType
 import android.view.*
 import android.widget.ArrayAdapter
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
@@ -26,7 +28,7 @@ import timber.log.Timber
 
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
-class SearchFragment : BaseFragment(), View.OnClickListener {
+class SearchFragment : BaseFragment(), View.OnClickListener, SearchView.OnQueryTextListener {
 
     private lateinit var binding: FragmentSearchBinding
     private lateinit var liftingAdapter: LiftingAdapter
@@ -47,14 +49,36 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
         inflater.inflate(R.menu.lifting_menu, menu)
         accountsMenuItem = menu.findItem(R.id.action_accounts)
         accountsMenuItem?.isVisible = false
+        val searchItem = menu.findItem(R.id.search)
+        val searchView =  searchItem.actionView as androidx.appcompat.widget.SearchView
+        searchView.inputType = InputType.TYPE_CLASS_TEXT
+        searchView.setOnQueryTextListener(object: androidx.appcompat.widget.SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                liftingAdapter.filter.filter(newText)
+                return true
+            }
+        })
         super.onCreateOptionsMenu(menu, inflater)
         initComponent()
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        return true
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return true
     }
 
     private fun initComponent() {
         liftingAdapter = LiftingAdapter(
             LiftingAdapter.LiftingListener( selectedItem = {
-                optionsDialog { option ->
+                val operator = searchViewModel.operator.value
+                optionsDialog(operator?.allowModification?:false) { option ->
                     when (option) {
                         EnumOptions.SUPPORT -> {
                             it.idLifting?.let { id ->
@@ -84,6 +108,11 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
                                 )
                             )
                         }
+                        EnumOptions.VISUALIZE -> {
+                            it.idLifting?.let {
+                                launchDirection(SearchFragmentDirections.actionSearchFragmentToInfoFragment(it))
+                            }
+                        }
                     }
                 }.show()
             })
@@ -103,8 +132,7 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
                 searchViewModel.onOperator()
                 binding.searchButton.visibility = View.VISIBLE
             }
-            liftingAdapter.setPermissionModify(it.allowModification ?: false)
-            binding.addFab.visibility = if (it.allowCapture == true) View.VISIBLE else View.GONE
+             binding.addFab.visibility = if (it.allowCapture == true) View.VISIBLE else View.GONE
         })
 
         searchViewModel.operatorList.observe(viewLifecycleOwner, {
@@ -143,12 +171,6 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
             R.id.action_accounts -> {
                 launchDirection(SearchFragmentDirections.actionSearchFragmentToUsersFragment())
             }
-            //R.id.action_add -> {
-            //    findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToLiftingFragment())
-            //}
-            //R.id.action_flow -> {
-            //    findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToUserInfoFragment())
-            //}
         }
         return super.onOptionsItemSelected(item)
     }
@@ -183,19 +205,24 @@ class SearchFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-    private fun optionsDialog(onSelect: (EnumOptions) -> Unit): Dialog {
+    private fun optionsDialog(modifyPermission:Boolean, onSelect: (EnumOptions) -> Unit): Dialog {
         val dialog = Dialog(requireContext())
         val binding = OptionsMenuBinding.inflate(dialog.layoutInflater)
         binding.supportButton.setOnClickListener {
             onSelect(EnumOptions.SUPPORT)
             dialog.dismiss()
         }
+        binding.editButton.visibility = if (modifyPermission) View.VISIBLE else View.GONE
         binding.editButton.setOnClickListener {
             onSelect(EnumOptions.EDIT)
             dialog.dismiss()
         }
         binding.mapButton.setOnClickListener {
             onSelect(EnumOptions.MAP)
+            dialog.dismiss()
+        }
+        binding.visualizeButton.setOnClickListener {
+            onSelect(EnumOptions.VISUALIZE)
             dialog.dismiss()
         }
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)

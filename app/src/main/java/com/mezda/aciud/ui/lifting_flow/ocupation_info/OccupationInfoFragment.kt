@@ -51,18 +51,6 @@ class OccupationInfoFragment : BaseFragment(), View.OnClickListener {
             if (professionPosition != 0) binding.professionSpinner.setSelection(professionPosition)
         }
 
-        viewModel.supportType.observe(viewLifecycleOwner) {
-            binding.supportTypeSpinner.adapter = ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_list_item_1,
-                it.toTypedArray()
-            )
-            val supportTypePosition = viewModel.getSupportTypeIndex()
-            if (supportTypePosition != 0) binding.supportTypeSpinner.setSelection(
-                supportTypePosition
-            )
-        }
-
         viewModel.flag.observe(viewLifecycleOwner, {
             binding.flagSpinner.adapter = ArrayAdapter(
                 requireContext(),
@@ -76,7 +64,7 @@ class OccupationInfoFragment : BaseFragment(), View.OnClickListener {
 
         viewModel.getFlags()
         viewModel.onGetProfessions()
-        viewModel.onGetSupportType()
+//        viewModel.onGetSupportType()
         binding.observationsTextArea.setText(viewModel.getObservations())
         setSelectedRadio(viewModel.getStatus4T())
         binding.nextButton.setOnClickListener(this)
@@ -89,7 +77,6 @@ class OccupationInfoFragment : BaseFragment(), View.OnClickListener {
                 if (validateRequiredInfo()) {
                     viewModel.saveOccupationInfo(
                         binding.professionSpinner.selectedItemPosition,
-                        binding.supportTypeSpinner.selectedItemPosition,
                         getSympathizerOptionValue(),
                         binding.flagSpinner.selectedItemPosition,
                         binding.observationsTextArea.text.toString()
@@ -105,7 +92,7 @@ class OccupationInfoFragment : BaseFragment(), View.OnClickListener {
 
     private fun validateRequiredInfo(): Boolean {
         return when {
-            binding.professionSpinner.selectedItemPosition == 0 -> {
+            /*binding.professionSpinner.selectedItemPosition == 0 -> {
                 toast("Profession faltante")
                 false
             }
@@ -120,7 +107,7 @@ class OccupationInfoFragment : BaseFragment(), View.OnClickListener {
             binding.flagSpinner.selectedItemPosition == 0 -> {
                 toast("Bandera Requerida")
                 false
-            }
+            }*/
             else -> true
         }
     }

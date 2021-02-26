@@ -70,7 +70,7 @@ class UserInfoFragment : BaseFragment(), View.OnClickListener {
 
         photoEncoded = viewModel.userInfo.picture_encoded
         viewModel.userInfo.picture_url?.let {
-            if (it != "null") {
+            if (it != "null" && !it.contains("fotolimpia.Jpeg")) {
                 Timber.e(it)
                 Glide.with(requireContext()).load(RetrofitModule.baseUrl + it.replace("~/", "")).circleCrop().into(binding.profilePictureImage)
             }

@@ -47,13 +47,6 @@
                     android:layout_marginTop="@dimen/medium_margin"
                     tools:listitem="@android:layout/simple_dropdown_item_1line" />
 
-                <Spinner
-                    android:id="@+id/support_type_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/medium_margin"
-                    tools:listitem="@android:layout/simple_dropdown_item_1line" />
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

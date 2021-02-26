@@ -38,8 +38,6 @@ data class LiftingInfo(
 
     @SerializedName("Idprofesion")
     var professionId: Int? = null,
-    @SerializedName("Idtapoyo")
-    var supportTypeId: Int? = null,
     @SerializedName("Observaciones")
     var observations: String? = null,
     @SerializedName("Simpatizante")
@@ -66,7 +64,6 @@ data class LiftingInfo(
         parcel.readString(),
         parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readValue(Int::class.java.classLoader) as? Int,
-        parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readString(),
         parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readValue(Int::class.java.classLoader) as? Int,
@@ -74,32 +71,15 @@ data class LiftingInfo(
     ) {
     }
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(name)
-        parcel.writeString(paternal_surname)
-        parcel.writeString(maternal_surname)
-        parcel.writeString(phone)
-        parcel.writeString(street)
-        parcel.writeString(number)
-        parcel.writeString(latitude)
-        parcel.writeString(longitude)
-        parcel.writeString(date)
-        parcel.writeValue(idLifting)
-        parcel.writeValue(idSuburb)
-        parcel.writeValue(idSupervisor)
-        parcel.writeValue(idOperator)
-        parcel.writeString(section)
-        parcel.writeValue(sectionId)
-        parcel.writeValue(professionId)
-        parcel.writeValue(supportTypeId)
-        parcel.writeString(observations)
-        parcel.writeValue(sympathizer)
-        parcel.writeValue(idFlag)
-        parcel.writeString(image)
-    }
-
     override fun describeContents(): Int {
         return 0
+    }
+
+    override fun writeToParcel(dest: Parcel?, flags: Int) {
+    }
+
+    fun fullName(): String {
+        return "$name $paternal_surname $maternal_surname"
     }
 
     companion object CREATOR : Parcelable.Creator<LiftingInfo> {
@@ -111,5 +91,6 @@ data class LiftingInfo(
             return arrayOfNulls(size)
         }
     }
+
 
 }

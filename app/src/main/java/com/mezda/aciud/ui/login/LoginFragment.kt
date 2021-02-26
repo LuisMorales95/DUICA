@@ -38,7 +38,7 @@ class LoginFragment : BaseFragment() {
 
         binding.startButton.setOnClickListener {
             val user = binding.userTextInputLayout.editText?.text?.toString() ?: ""
-            val password = binding.userTextInputLayout.editText?.text?.toString() ?: ""
+            val password = binding.passwordTextInputLayout.editText?.text?.toString() ?: ""
             if (validParameters()) {
                 binding.userTextInputLayout.isErrorEnabled = false
                 binding.passwordTextInputLayout.isErrorEnabled = false
@@ -85,8 +85,8 @@ class LoginFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         Glide.with(requireView()).load(R.drawable.aciud).into(binding.logoImage)
         Glide.with(requireView()).load(R.drawable.morena_logo).into(binding.imageView)
-        binding.userTextInputLayout.editText?.setText("TEST")
-        binding.passwordTextInputLayout.editText?.setText("TEST")
+//        binding.userTextInputLayout.editText?.setText("xyz")
+//        binding.passwordTextInputLayout.editText?.setText("123")
     }
 
     companion object {

@@ -19,6 +19,7 @@
 
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/info_validation_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/large_margin"
@@ -392,20 +393,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="@tools:sample/first_names" />
-
-                            <TextView
-                                style="@style/TextAppearance.AppCompat.Caption"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Tipo de Apoyo"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/support_type_text"
-                                style="@style/TextAppearance.AppCompat.Caption"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                tools:text="@tools:sample/last_names" />
 
                             <TextView
                                 style="@style/TextAppearance.AppCompat.Caption"

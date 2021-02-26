@@ -111,6 +111,7 @@ class AddressInfoFragment : BaseFragment(), View.OnClickListener {
             binding.sectionAutoComplete.setText(viewModel.getSection())
         }
 
+        viewModel.onGetSectionsAll()
         viewModel.onLocalityByDefault()
         binding.nextButton.setOnClickListener(this)
         return binding.root
@@ -141,7 +142,7 @@ class AddressInfoFragment : BaseFragment(), View.OnClickListener {
 
     private fun validateRequiredInfo(): Boolean {
         return when {
-            binding.streetText.editText?.text.toString().isEmpty() -> {
+            /*binding.streetText.editText?.text.toString().isEmpty() -> {
                 binding.streetText.error = "Requerido"
                 false
             }
@@ -152,7 +153,7 @@ class AddressInfoFragment : BaseFragment(), View.OnClickListener {
             binding.suburbAutoComplete.text.toString().isEmpty() -> {
                 binding.streetText.error = "Requerido"
                 false
-            }
+            }*/
             else -> true
         }
     }

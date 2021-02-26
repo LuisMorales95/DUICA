@@ -7,8 +7,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.mezda.aciud.ui.login.LoginFragment"
-        tools:layout="@layout/fragment_login">
+        android:name="com.mezda.aciud.ui.login.LoginFragment" >
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
@@ -19,16 +18,13 @@
     </fragment>
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.mezda.aciud.ui.register.RegisterFragment"
-        tools:layout="@layout/fragment_register" />
+        android:name="com.mezda.aciud.ui.register.RegisterFragment" />
     <fragment
         android:id="@+id/liftingFragment"
-        android:name="com.mezda.aciud.ui.lifting.LiftingFragment"
-        tools:layout="@layout/fragment_lifting" />
+        android:name="com.mezda.aciud.ui.lifting.LiftingFragment" />
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.mezda.aciud.ui.search.SearchFragment"
-        tools:layout="@layout/fragment_search" >
+        android:name="com.mezda.aciud.ui.search.SearchFragment" >
         <action
             android:id="@+id/action_searchFragment_to_liftingFragment"
             app:destination="@id/liftingFragment" />
@@ -55,12 +51,14 @@
                 android:defaultValue="0"
                 app:argType="integer" />
         </action>
+        <action
+            android:id="@+id/action_searchFragment_to_infoFragment"
+            app:destination="@id/infoFragment" />
     </fragment>
     <fragment
         android:id="@+id/mapsFragment"
         android:name="com.mezda.aciud.ui.map.MapsFragment"
-        android:label="@string/location"
-        tools:layout="@layout/fragment_maps" >
+        android:label="@string/location" >
         <argument
             android:name="locations"
             app:argType="com.mezda.aciud.data.models.Locations" />
@@ -70,8 +68,7 @@
         <fragment
             android:id="@+id/userInfoFragment"
             android:name="com.mezda.aciud.ui.lifting_flow.user_info.UserInfoFragment"
-            android:label="Levantamiento Paso 1"
-            tools:layout="@layout/fragment_user_info">
+            android:label="Levantamiento Paso 1" >
             <action
                 android:id="@+id/action_userInfoFragment_to_addressInfoFragment"
                 app:destination="@id/addressInfoFragment" />
@@ -83,8 +80,7 @@
         <fragment
             android:id="@+id/addressInfoFragment"
             android:name="com.mezda.aciud.ui.lifting_flow.address_info.AddressInfoFragment"
-            android:label="Levantamiento Paso 2"
-            tools:layout="@layout/fragment_address_info">
+            android:label="Levantamiento Paso 2" >
             <action
                 android:id="@+id/action_addressInfoFragment_to_geoLocationInfoFragment"
                 app:destination="@id/geoLocationInfoFragment" />
@@ -92,8 +88,7 @@
         <fragment
             android:id="@+id/geoLocationInfoFragment"
             android:name="com.mezda.aciud.ui.lifting_flow.geolocation_info.GeoLocationInfoFragment"
-            android:label="Levantamiento Paso 3"
-            tools:layout="@layout/fragment_geolocation_info" >
+            android:label="Levantamiento Paso 3" >
             <action
                 android:id="@+id/action_geoLocationInfoFragment_to_occupationInfoFragment"
                 app:destination="@id/occupationInfoFragment" />
@@ -101,8 +96,7 @@
         <fragment
             android:id="@+id/occupationInfoFragment"
             android:name="com.mezda.aciud.ui.lifting_flow.ocupation_info.OccupationInfoFragment"
-            android:label="Levantamiento Paso 4"
-            tools:layout="@layout/fragment_occupation">
+            android:label="Levantamiento Paso 4" >
             <action
                 android:id="@+id/action_occupationInfoFragment_to_previewInfoFragment"
                 app:destination="@id/previewInfoFragment" />
@@ -110,8 +104,7 @@
         <fragment
             android:id="@+id/previewInfoFragment"
             android:name="com.mezda.aciud.ui.lifting_flow.preview_info.PreviewInfoFragment"
-            android:label="Datos Recolectados"
-            tools:layout="@layout/fragment_preview_info">
+            android:label="Datos Recolectados" >
             <action
                 android:id="@+id/action_partyInfoFragment_to_searchFragment"
                 app:destination="@id/searchFragment"
@@ -121,15 +114,13 @@
     <fragment
         android:id="@+id/usersFragment"
         android:name="com.mezda.aciud.ui.users.UsersFragment"
-        android:label="Cuentas"
-        tools:layout="@layout/fragment_users"/>
+        android:label="Cuentas" />
     <navigation android:id="@+id/nav_support"
         app:startDestination="@id/supportFragment">
         <fragment
             android:id="@+id/supportFragment"
             android:name="com.mezda.aciud.ui.support.list.SupportListFragment"
-            android:label="Apoyos"
-            tools:layout="@layout/fragment_support">
+            android:label="Apoyos" >
             <argument
                 android:name="IdLift"
                 android:defaultValue="0"
@@ -137,11 +128,29 @@
             <action
                 android:id="@+id/action_supportFragment_to_supportNewFragment"
                 app:destination="@id/supportNewFragment" />
+            <action
+                android:id="@+id/action_supportFragment_to_supportImageFragment"
+                app:destination="@id/supportImageFragment" />
         </fragment>
         <fragment
             android:id="@+id/supportNewFragment"
             android:name="com.mezda.aciud.ui.support.create.SupportNewFragment"
-            android:label="fragment_new_support"
-            tools:layout="@layout/fragment_new_support" />
+            android:label="Agregar Apoyo" />
+        <fragment
+            android:id="@+id/supportImageFragment"
+            android:name="com.mezda.aciud.ui.support.image.SupportImageFragment"
+            android:label="Imagen de Apoyo" >
+            <argument
+                android:name="imagePath"
+                app:argType="string" />
+        </fragment>
     </navigation>
+    <fragment
+        android:id="@+id/infoFragment"
+        android:name="com.mezda.aciud.ui.info.InfoFragment"
+        android:label="Datos Recolectados" >
+        <argument
+            android:name="liftingId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

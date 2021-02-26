@@ -32,16 +32,20 @@ class LoginViewModel @ViewModelInject constructor(
     fun login(user: String, password: String) {
         ioThread.launch {
             _loading.postValue(ValueWrapper(true))
-            val operators = getOperators().body() ?: listOf()
+            val operators = getOperators().body()
             _loading.postValue(ValueWrapper(false))
-            if (operators.isEmpty()) {
+            if (operators?.isEmpty() == true) {
                 _messages.postValue("Ningun usuario encontrado")
             } else {
                 run loop@ {
                     var found = false
-                    operators.forEach {
+                    operators?.forEach {
+                        Timber.e(Gson().toJson(it))
+                        Timber.e("${it.user} == $user && ${it.password} == $password")
                         if (it.user == user && it.password == password) {
+                            Timber.e(Gson().toJson(it))
                             if (it.allowLogin == true){
+                                Timber.e(Gson().toJson(it))
                                 found = true
                                 mainRepositoryImpl.liveOperator.postValue(it)
                                 _messages.postValue("Usuario Encontrado")
@@ -55,8 +59,7 @@ class LoginViewModel @ViewModelInject constructor(
                     }
                 }
             }
-            Timber.e(Gson().toJson(operators))
-        }
+         }
     }
 
     private suspend fun getOperators(): Response<List<Operators>> {

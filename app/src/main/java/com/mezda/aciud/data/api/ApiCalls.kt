@@ -102,4 +102,16 @@ interface ApiCalls {
         @Query("pwdApp") password: String,
         @Query("idLevantamiento") idLifting: String,
     ): Response<List<Support>>
+
+    @DELETE("api/ApoyoMultiple")
+    suspend fun deleteSupport(
+        @Query("pwdApp") password: String,
+        @Query("idApoyoMultiple") supportId: String
+    ): Response<Int>
+
+    @GET("api/Consultas/GetLevantamientoR2")
+    suspend fun getLiftingInfo(
+        @Query("pwdApp") password: String,
+        @Query("idLevantamiento") idLifting: String,
+    ): Response<List<LiftingInfoVisualization>>
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.*
+import timber.log.Timber
 
 abstract class BaseViewModel : ViewModel() {
 
@@ -15,6 +16,7 @@ abstract class BaseViewModel : ViewModel() {
     val mainThread = CoroutineScope(Dispatchers.Main + job)
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Timber.e(throwable.message ?: "Error null")
         _messages.postValue(throwable.message)
         _messages.postValue("")
     }

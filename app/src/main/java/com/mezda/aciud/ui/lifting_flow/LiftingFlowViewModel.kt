@@ -24,9 +24,10 @@ class LiftingFlowViewModel @ViewModelInject constructor(
 
     private var liftingInfo: LiftingInfo? = null
 
-    private val _loading = MutableLiveData<Boolean>()
-    val loading: LiveData<Boolean>
+    private val _loading = MutableLiveData<ValueWrapper<Boolean>>()
+    val loading: LiveData<ValueWrapper<Boolean>>
         get() = _loading
+
     private val _registerSuccess = MutableLiveData<ValueWrapper<Boolean>>()
     val registerSuccess: LiveData<ValueWrapper<Boolean>>
         get() = _registerSuccess
@@ -145,6 +146,21 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         }
     }
 
+    fun onGetSectionsAll() {
+        ioThread.launch {
+            _section.postValue(listOf())
+            val sections = liftingRepositoryImpl.getSection()
+            if (sections.isEmpty()) {
+                _section.postValue(listOf())
+                _messages.postValue("NO SE ENCONTRARON SECCIÓNES")
+                return@launch
+            }
+            _section.postValue(sections)
+            _messages.postValue("Secciónes Cargadas")
+
+        }
+    }
+
     fun onLocalityByDefault() {
         ioThread.launch {
             val suburbsResponse = getSuburbs(Locality.getDefault().idLocality ?: 0)
@@ -176,10 +192,10 @@ class LiftingFlowViewModel @ViewModelInject constructor(
                 }
             }
         }
-        if (sectionId == -1) {
+        /*if (sectionId == -1) {
             _messages.postValue("Seccion Invalida")
             return false
-        }
+        }*/
 
         var suburbId = -1
         run loop@{
@@ -190,10 +206,10 @@ class LiftingFlowViewModel @ViewModelInject constructor(
                 }
             }
         }
-        if (suburbId == -1) {
+        /*if (suburbId == -1) {
             _messages.postValue("Seccion Invalida")
             return false
-        }
+        }*/
 
         directionInfo.apply {
             this.street = street
@@ -244,16 +260,6 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         list
     }
 
-    private val _supportType = MutableLiveData<List<SupportTypes>>()
-    val supportType = Transformations.map(_supportType) {
-        val list = mutableListOf<String>()
-        list.add("Selecciona un Tipo de apoyo")
-        it.forEach { support ->
-            list.add(support.supportType)
-        }
-        list
-    }
-
     private val _flag = MutableLiveData<List<Flag>>()
     val flag = Transformations.map(_flag) {
         val list = mutableListOf<String>()
@@ -276,12 +282,6 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         }
     }
 
-    fun onGetSupportType() {
-        ioThread.launch {
-            _supportType.postValue(liftingRepositoryImpl.getSupportType())
-        }
-    }
-
     fun getProfessionIndex(): Int {
         var professionIndex = 0
         if (occupationInfo.professionId != 0) {
@@ -298,21 +298,7 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         return professionIndex
     }
 
-    fun getSupportTypeIndex(): Int {
-        var supportTypeIndex = 0
-        if (occupationInfo.supportTypesId != 0) {
-            run loop@{
-                _supportType.value?.forEachIndexed { index, supportTypes ->
-                    if (occupationInfo.supportTypesId == supportTypes.id) {
-                        supportTypeIndex = index + 1
-                        return@loop
-                    }
-                }
 
-            }
-        }
-        return supportTypeIndex
-    }
 
     fun getStatus4T() = partyInfo.status_4t ?: 1
 
@@ -335,7 +321,6 @@ class LiftingFlowViewModel @ViewModelInject constructor(
 
     fun saveOccupationInfo(
         profession_position: Int,
-        supportType_position: Int,
         statusId: Int,
         flagPosition: Int,
         observations: String
@@ -343,17 +328,19 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         ioThread.launch {
             partyInfo.apply {
                 status_4t = statusId
-                flagId = _flag.value?.get(flagPosition - 1)?.id ?: 0
-                flag = _flag.value?.get(flagPosition - 1)?.flag ?: ""
+                if (flagPosition != 0){
+                    flagId = _flag.value?.get(flagPosition - 1)?.id ?: 0
+                    flag = _flag.value?.get(flagPosition - 1)?.flag ?: ""
+                }
             }
             Timber.e("partyInfo: ${Gson().toJson(partyInfo)}")
             occupationInfo.apply {
-                this.professionId = _profession.value?.get(profession_position - 1)?.id ?: 0
-                this.profession =
-                    _profession.value?.get(profession_position - 1)?.profession ?: ""
-                this.supportTypesId = _supportType.value?.get(supportType_position - 1)?.id ?: 0
-                this.supportTypes =
-                    _supportType.value?.get(supportType_position - 1)?.supportType ?: ""
+                if (profession_position != 0){
+                    this.professionId = _profession.value?.get(profession_position - 1)?.id ?: 0
+                    this.profession = _profession.value?.get(profession_position - 1)?.profession ?: ""
+                }
+//                this.supportTypesId = _supportType.value?.get(supportType_position - 1)?.id ?: 0
+//                this.supportTypes = _supportType.value?.get(supportType_position - 1)?.supportType ?: ""
                 this.observation = observations
             }
             Timber.e("occupationInfo: ${Gson().toJson(occupationInfo)}")
@@ -366,57 +353,74 @@ class LiftingFlowViewModel @ViewModelInject constructor(
     @SuppressLint("SimpleDateFormat")
     fun sendLifting() {
         ioThread.launch {
-            _loading.postValue(true)
-            try {
-                liftingInfo = liftingInfo ?: LiftingInfo()
-                liftingInfo?.name = userInfo.name
-                liftingInfo?.paternal_surname = userInfo.paternal_last_name
-                liftingInfo?.maternal_surname = userInfo.maternal_last_name
-                liftingInfo?.phone = userInfo.phone_number
-                liftingInfo?.image = userInfo.picture_encoded ?: "null"
+            _loading.postValue(ValueWrapper(true))
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo = liftingInfo ?: LiftingInfo()
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.name = userInfo.name
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.paternal_surname = userInfo.paternal_last_name
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.maternal_surname = userInfo.maternal_last_name
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.phone = userInfo.phone_number
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.image = userInfo.picture_encoded ?: "null"
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
 
-                liftingInfo?.street = directionInfo.street
-                liftingInfo?.number = directionInfo.street_number.toString()
-                liftingInfo?.section = directionInfo.section
-                liftingInfo?.sectionId = directionInfo.sectionId
+            liftingInfo?.street = directionInfo.street ?: "0"
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.number = (directionInfo.street_number ?: 0).toString()
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.section = directionInfo.section ?: "0"
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.sectionId = directionInfo.sectionId ?: 0
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
 
-                liftingInfo?.latitude = geolocationinfo.latitude.toString()
-                liftingInfo?.longitude = geolocationinfo.longitude.toString()
+            liftingInfo?.latitude = geolocationinfo.latitude.toString()
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.longitude = geolocationinfo.longitude.toString()
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
 
-                liftingInfo?.supportTypeId = occupationInfo.supportTypesId
-                liftingInfo?.professionId = occupationInfo.professionId
-                liftingInfo?.observations = occupationInfo.observation
-                liftingInfo?.sympathizer = partyInfo.status_4t
-                liftingInfo?.idFlag = partyInfo.flagId
+//            liftingInfo?.supportTypeId = occupationInfo.supportTypesId ?: 0
+//            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.professionId = occupationInfo.professionId ?: 0
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.observations = occupationInfo.observation ?: ""
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.sympathizer = partyInfo.status_4t ?: 0
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.idFlag = partyInfo.flagId ?: 0
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
 
-                val dateFormat = SimpleDateFormat(format)
-                val formattedDate = dateFormat.format(Date(System.currentTimeMillis()))
-                liftingInfo?.date = formattedDate
-                liftingInfo?.idSuburb = directionInfo.suburbId
-                liftingInfo?.idOperator = mainRepositoryImpl.liveOperator.value?.operatorId
-                liftingInfo?.idSupervisor = mainRepositoryImpl.liveOperator.value?.supervisorId
-                Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            val dateFormat = SimpleDateFormat(format)
+            val formattedDate = dateFormat.format(Date(System.currentTimeMillis()))
+            liftingInfo?.date = formattedDate
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.idSuburb = directionInfo.suburbId ?: 0
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.idOperator = mainRepositoryImpl.liveOperator.value?.operatorId ?: 0
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
+            liftingInfo?.idSupervisor = mainRepositoryImpl.liveOperator.value?.supervisorId ?: 0
+            Timber.e("liftingInfo: ${Gson().toJson(liftingInfo)}")
 
 
-                val response = when(liftingInfo?.idLifting == 0) {
-                    true -> sendInfo(liftingInfo!!)
-                    false -> updateInfo(liftingInfo!!)
-                }
-                _loading.postValue(false)
-                if (response.isSuccessful) {
-                    if ((response.body() ?: 0) > 0) {
-                        _messages.postValue("Solicitud Exitosa")
-                        _registerSuccess.postValue(ValueWrapper(true))
-                    } else {
-                        _messages.postValue("Solicitud Fallo")
-                    }
+            val response = when (liftingInfo?.idLifting == 0) {
+                true -> sendInfo(liftingInfo!!)
+                false -> updateInfo(liftingInfo!!)
+            }
+            _loading.postValue(ValueWrapper(false))
+            if (response.isSuccessful) {
+                if ((response.body() ?: 0) > 0) {
+                    _messages.postValue("Solicitud Exitosa")
+                    _registerSuccess.postValue(ValueWrapper(true))
                 } else {
                     _messages.postValue("Solicitud Fallo")
                 }
-            } catch (ex: Exception) {
-                _loading.postValue(false)
-                Timber.e(ex)
+            } else {
+                _messages.postValue("Solicitud Fallo")
             }
+
         }
     }
 
@@ -458,8 +462,6 @@ class LiftingFlowViewModel @ViewModelInject constructor(
         occupationInfo = OccupationInfo(
             lifting.professionId,
             "",
-            supportTypesId = lifting.supportTypeId,
-            supportTypes = "",
             observation = lifting.observations
         )
 
